@@ -5794,7 +5794,9 @@ html.walked-up .menu { z-index: 46; }
   // so the face beneath it in an overlap is always opaque there (no dark trough).
   function placeFace(f, ang, z, alpha, top) {
     var vis = alpha > 0.001 && Math.abs(ang) < f.g.half + G.viewHalf + 0.5;
-    var wc = vis && !(C.look && f.i === C.look.st) ? 'transform' : '';         // walked up: drawn at the camera's real scale, so the label is sharp
+    // r9.1 (Astra R9-01): every visible face keeps its stable compositing layer, also the one walked up to; the sharp
+    // parts of the close-up are drawn by their own overlays (art layer, label card), so the face is never re-rastered.
+    var wc = vis ? 'transform' : '';
     if (vis !== f.vis) { f.el.style.visibility = vis ? 'inherit' : 'hidden'; f.vis = vis; }
     if (f._wc !== wc) { f.el.style.willChange = wc; f._wc = wc; }
 
@@ -6786,7 +6788,15 @@ html.walked-up .menu { z-index: 46; }
   function labelRect(i) { var f = faces[i], R = faceImgRect(i); return f && f.wlFrac && R ? fracRect(R, [f.wlFrac.x, f.wlFrac.y, f.wlFrac.w, f.wlFrac.h]) : null; }
   function union(a, b) { if (!a) return b; if (!b) return a; var x = Math.min(a.x, b.x), y = Math.min(a.y, b.y); return { x: x, y: y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y }; }
   function camApply(c, r) { return { x: c.tx + c.s * r.x, y: c.ty + c.s * r.y, w: r.w * c.s, h: r.h * c.s }; }
-  function camLerp(a, b, p) { return { s: a.s * Math.pow(b.s / a.s, p), tx: a.tx + (b.tx - a.tx) * p, ty: a.ty + (b.ty - a.ty) * p }; }
+  // r9.1 (Astra R9-01): one consistent camera path. The world point at the centre of the screen moves in a straight line
+  // while the view's size changes geometrically, so every intermediate view lies inside the box spanned by the two end
+  // views (which are covered by the room); before, scale was geometric but the translation linear, and mid-way the view
+  // could leave the room entirely.
+  function camLerp(a, b, p) {
+    var s = a.s * Math.pow(b.s / a.s, p), W2 = G.W / 2, H2 = G.H / 2;
+    var cx = (W2 - a.tx) / a.s + ((W2 - b.tx) / b.s - (W2 - a.tx) / a.s) * p, cy = (H2 - a.ty) / a.s + ((H2 - b.ty) / b.s - (H2 - a.ty) / a.s) * p;
+    return { s: s, tx: W2 - s * cx, ty: H2 - s * cy };
+  }
   var CAM0 = { s: 1, tx: 0, ty: 0 };
   // The free area the close-up frames into: below the Back control, above the tools, between the arrows.
   function area() {
@@ -6809,8 +6819,15 @@ html.walked-up .menu { z-index: 46; }
     return clampCam(camFit(U, area()), i);
   }
   // Native: one art-layer pixel per CSS pixel (never enlarged further at the close-detail level).
-  function nativeScale(i) { var a = layerOf(i), r = layerRect(i); return a && r ? a.w / r.w : 2; }
-  function detailScale(i) { return Math.max(nativeScale(i), lookCam(i).s * 1.5); }
+  // r9.1 (Astra R9-03): never past native. One art-layer pixel per DEVICE pixel, from the decoded image's own width;
+  // no forced minimum. Without headroom over the walk-up framing there is no closer level (click, wheel, pinch, button).
+  function nativeScale(i) {
+    var a = layerOf(i), r = layerRect(i); if (!a || !r) return 1;
+    var as = ASSETS[a.src], nw = as && as.state === 'ready' && as.img.naturalWidth ? as.img.naturalWidth : a.w;
+    return nw / (r.w * (window.devicePixelRatio || 1));
+  }
+  function detailScale(i) { return Math.max(nativeScale(i), lookCam(i).s); }
+  function headroom(i) { return nativeScale(i) > lookCam(i).s * 1.05; }
   function detailCam(i, focus) {
     var R = faceImgRect(i), s = detailScale(i), A = area();
     var P = focus ? { x: R.x + focus.u * R.w, y: R.y + focus.v * R.h } : (function (a) { return { x: a.x + a.w / 2, y: a.y + a.h / 2 }; })(artRect(i));
@@ -6979,7 +6996,7 @@ html.walked-up .menu { z-index: 46; }
   }
   function updateZoomTools() {
     var L = C.look; if (!L) return;
-    $('wuZoomIn').disabled = L.level !== 'look';
+    $('wuZoomIn').disabled = L.level !== 'look' || !headroom(L.st);
     $('wuZoomOut').disabled = L.level === 'look' && !L.freeZoom;
     var head = loupeHeadroom(); $('wuLoupeBtn').disabled = L.level === 'label' || head < 1.1;
     $('wuLoupeBtn').title = head < 1.1 ? 'The full detail is already shown' : '';
@@ -7040,7 +7057,7 @@ html.walked-up .menu { z-index: 46; }
   function focusAt(x, y) { var L = C.look, R = faceImgRect(L.st), c = L.cam; return { u: ((x - c.tx) / c.s - R.x) / R.w, v: ((y - c.ty) / c.s - R.y) / R.h }; }
   function closer(x, y) {
     var L = C.look; if (!L || L.phase !== 'shown') return;
-    if (L.level === 'look') dispatch({ type: 'go', hash: lookHash(L.st, 'detail'), focus: focusAt(x, y) });
+    if (L.level === 'look') { if (headroom(L.st)) dispatch({ type: 'go', hash: lookHash(L.st, 'detail'), focus: focusAt(x, y) }); }
     else if (L.level === 'detail') setLookLevel('detail', focusAt(x, y));        // already close: the view centres there
   }
   // Free zoom (wheel, pinch, + and -): the camera scales about a point, between the walk-up framing and native.
@@ -7069,7 +7086,7 @@ html.walked-up .menu { z-index: 46; }
     var L = C.look; if (!L || L.phase !== 'shown') return;
     if (!G2.ptrs[e.pointerId]) {                                  // hover: the loupe follows a mouse while it is switched on
       if (e.pointerType === 'mouse' && L.loupeOn) setLoupe({ x: e.clientX, y: e.clientY, mag: L.loupe && L.loupe.mag });
-      WU.classList.toggle('over-art', e.pointerType === 'mouse' && L.level !== 'label' && hitArt(e.clientX, e.clientY) && !L.loupeOn);
+      WU.classList.toggle('over-art', e.pointerType === 'mouse' && L.level !== 'label' && hitArt(e.clientX, e.clientY) && !L.loupeOn && (L.level === 'detail' || headroom(L.st)));
       WU.classList.toggle('over-label', e.pointerType === 'mouse' && L.level === 'look' && hitLabel(e.clientX, e.clientY));
       return;
     }
@@ -7127,7 +7144,7 @@ html.walked-up .menu { z-index: 46; }
   wuBack.addEventListener('click', lookBackOut);
   wuPrev.addEventListener('click', function () { navLook(-1); });
   wuNext.addEventListener('click', function () { navLook(1); });
-  $('wuZoomIn').addEventListener('click', function () { var L = C.look; if (L && L.level === 'look') dispatch({ type: 'go', hash: lookHash(L.st, 'detail') }); });
+  $('wuZoomIn').addEventListener('click', function () { var L = C.look; if (L && L.level === 'look' && headroom(L.st)) dispatch({ type: 'go', hash: lookHash(L.st, 'detail') }); });
   $('wuZoomOut').addEventListener('click', function () { var L = C.look; if (!L) return; if (L.freeZoom && L.level === 'look') setLookLevel('look'); else lookBackOut(); });
   $('wuLoupeBtn').addEventListener('click', function () {
     var L = C.look; if (!L) return; L.loupeOn = !L.loupeOn;
