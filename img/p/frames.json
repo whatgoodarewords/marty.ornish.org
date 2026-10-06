@@ -1,0 +1,10 @@
+{
+  "_note": "Portrait frames: floor-to-back-wall junction in source pixels of a 1024x1536 frame, measured on wall-only side strips. Target common floor y=960 (62.5%), chosen to minimise the largest shift (86 px).",
+  "sourceHeight": 1536,
+  "targetFloorY": 960,
+  "frames": {
+    "station-alien": 890, "station-aliens2": 1024, "station-all-tied-up": 905,
+    "station-assemblage": 874, "station-yoyo-gown": 878, "station-five-years": 1031,
+    "station-portals": 1006, "station-resilience": 1038, "station-st-lucia": 1016
+  }
+}

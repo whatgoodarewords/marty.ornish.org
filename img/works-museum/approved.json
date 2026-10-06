@@ -1,0 +1,382 @@
+{
+ "3d_aliens2.jpg": {
+  "approved": false,
+  "sha256": "38e36f352d4baa2e3d87bf2befc9836fb69dcddc953bc2bca6a04c126f0843bc",
+  "why": "studio photograph on a light wall; Original photos only until a museum version ships"
+ },
+ "3d_aliens2_detail.jpg": {
+  "approved": true,
+  "sha256": "03082bfbf8dc4d394a63401f9013024cfa89fbac0c7422bfafd4847324cc5541",
+  "source": "v6 SHIP"
+ },
+ "3d_aliens_group.jpg": {
+  "approved": true,
+  "sha256": "5fe24141861286a8b4e70d8205ed26102154fd4898e5e951c2b83ae359d3cdd1",
+  "source": "v3 accepted"
+ },
+ "3d_chubby_alien.jpg": {
+  "approved": true,
+  "sha256": "483dc20c91941dca3d337cd04d98b8ae614a21b1547942c42d75fc42bd1e5799",
+  "source": "v3 accepted"
+ },
+ "3d_fold.jpg": {
+  "approved": true,
+  "sha256": "55eabf9f744b254bd4720557c093efdc1322e6a66c2dc21159af04d2cddc6917",
+  "source": "v3 accepted"
+ },
+ "3d_glasses.jpg": {
+  "approved": true,
+  "sha256": "ea4a94d37103f725436c994cf957e6d7f6ae37b02064d71d4438739574b97b0f",
+  "source": "v3 accepted"
+ },
+ "3d_resilience.jpg": {
+  "approved": true,
+  "sha256": "1aeca068a8c5827f6fe72bbd113d1d41031be82ccf752de27dd82b0c4f3f1d04",
+  "source": "v3 accepted"
+ },
+ "3d_sewing_machine.jpg": {
+  "approved": true,
+  "sha256": "de1784bb08221544321f55b53e361723f72258e65cd9d5e43cc4dc81af7fc764",
+  "source": "v5 SHIP"
+ },
+ "3d_turn-on.jpg": {
+  "approved": true,
+  "sha256": "aefd2b80ba278948181d82ef0e84939d1c93d69ba06f9dd76675ab8d77b85a46",
+  "source": "v6 SHIP"
+ },
+ "3d_typewriter.jpg": {
+  "approved": true,
+  "sha256": "6726d5c3c773afa2feeab694030a020c7a0328fc2ac05880d05f506de1fd5b62",
+  "source": "v6 SHIP"
+ },
+ "jackets_1920a.jpg": {
+  "approved": true,
+  "sha256": "37e4ecfdbf9130e5ff788151a34f8ec628994706dcce5f544a913f871fd7a829",
+  "source": "v3 accepted"
+ },
+ "jackets_1920b.jpg": {
+  "approved": true,
+  "sha256": "e45b37c7599283b31a5ee9e37a48cd91fa732e1c9c57ada8d488295e78880273",
+  "source": "v3 accepted"
+ },
+ "jackets_1940a.jpg": {
+  "approved": true,
+  "sha256": "3ac859ff8ae96fd21fd2557448526e19764e05928368642a830b2ff0bda1944a",
+  "source": "v3 accepted"
+ },
+ "jackets_1940b.jpg": {
+  "approved": true,
+  "sha256": "12fb29ce6e72323bb06c0d7e39db767a3e6c36508e7045d56ac6e4dd2f3ac375",
+  "source": "v3 accepted"
+ },
+ "jackets_2792.jpg": {
+  "approved": true,
+  "sha256": "5058ee725956e2eae217f8de445301e86445dccabddc3c7b35521b511eda96cf",
+  "source": "v3 accepted"
+ },
+ "jackets_2793.jpg": {
+  "approved": true,
+  "sha256": "94c44ec7a1714f9d42f7a9ae23fb7f84e9949cad495c29dc274fa7ae51b1bf80",
+  "source": "v3 accepted"
+ },
+ "jackets_2829.jpg": {
+  "approved": true,
+  "sha256": "c0b562698412824f9b0a1ccd73a2ac3d245c5845166407c12ef96eb7cd2c2c4f",
+  "source": "v3 accepted"
+ },
+ "jackets_2831.jpg": {
+  "approved": true,
+  "sha256": "2938aec870289986de5a95a11c509cb4ef48aa05ca3fd2516384b2bfea62a38b",
+  "source": "v3 accepted"
+ },
+ "jackets_2913.jpg": {
+  "approved": true,
+  "sha256": "bc608c0304ebbef673d9d3b6ff63c0422f811186bd8257c9c12ab17960a26a29",
+  "source": "v3 accepted"
+ },
+ "jackets_2914.jpg": {
+  "approved": true,
+  "sha256": "f9d20367ef3028200c0344721de224e30ed0fc688c4df0daad606df1bd39a154",
+  "source": "v3 accepted"
+ },
+ "jackets_black_bussle1.jpg": {
+  "approved": true,
+  "sha256": "4666f363b4db5af177cae245a17d7ffd83e94552cb1537d45e2fc1e58c4f40b8",
+  "source": "v3 accepted"
+ },
+ "jackets_black_bussle2.jpg": {
+  "approved": true,
+  "sha256": "15988749a60f2e43ac3d18eba30ef5a107e57384223fcdfa555b6fefd086f812",
+  "source": "v3 accepted"
+ },
+ "jackets_jacket.jpg": {
+  "approved": true,
+  "sha256": "8dbef17340267ec9f8839611fcb01d3ce2a8e222f3f980820ee1808c2238fcdf",
+  "source": "kept as photographed"
+ },
+ "jackets_peacock1.jpg": {
+  "approved": true,
+  "sha256": "deed320b7b74b72b7851862f7d453c4ad6bd0698f759e6be6391fa59740dcd18",
+  "source": "v3 accepted"
+ },
+ "jackets_peacock2.jpg": {
+  "approved": true,
+  "sha256": "b46dae686e43d7e98b64a8d812605c20fa331d69b859f178aa3ae830d1d3b939",
+  "source": "v3 accepted"
+ },
+ "quilts_archetypes.jpg": {
+  "approved": true,
+  "sha256": "661700f5864a75c4d0d2e4cce4ea70703c001d121deeeba4d06fea3b380d02b0",
+  "source": "v4 SHIP"
+ },
+ "quilts_barbie.jpg": {
+  "approved": true,
+  "sha256": "21eda0c162925c7c320672073891470c1a10998072929aceca52e9d8b695a8d6",
+  "source": "v3 accepted"
+ },
+ "quilts_brillo.jpg": {
+  "approved": true,
+  "sha256": "12129b1cc379b82a1631bc001e02a2cbb3988c3cb479a0b35d610f176b86de3e",
+  "source": "v3 accepted"
+ },
+ "quilts_burlesque.jpg": {
+  "approved": true,
+  "sha256": "a689e58798b46643ca6ddb9d3f605587e81056e30fb347d491be04232ec6b531",
+  "source": "v3 accepted"
+ },
+ "quilts_cravings.jpg": {
+  "approved": true,
+  "sha256": "333279ff25e50e0f9b4b24207c82bc2b43ac57047ef7073265154a4bec29790d",
+  "source": "v5 SHIP"
+ },
+ "quilts_cries.jpg": {
+  "approved": true,
+  "sha256": "a677b73b128da8bfd73fdce7d0703a8c3ab949e36febd91906e9fe325c82cd22",
+  "source": "v4 SHIP"
+ },
+ "quilts_entropy.jpg": {
+  "approved": true,
+  "sha256": "30cb35f7d234b51fd46cd2f50a85c52c224ad48df4ec5f930d469fb942e8c006",
+  "source": "v6 SHIP"
+ },
+ "quilts_esmerelda.jpg": {
+  "approved": true,
+  "sha256": "e74d7718b40b2b1d15652cf18744f9b69bb08613af72b88ab300c206e6cae75a",
+  "source": "v4 SHIP"
+ },
+ "quilts_five_years.jpg": {
+  "approved": true,
+  "sha256": "caa882aa31c7d04a15a8a4ab66310c58c6a0a58e23c19e795558dff7a04566f8",
+  "source": "v3 accepted"
+ },
+ "quilts_grow_up.jpg": {
+  "approved": true,
+  "sha256": "4aada709fd76921afa1cde3817a4ff2653334aa5c9281db8486a0debcefb2814",
+  "source": "v3 accepted"
+ },
+ "quilts_heart.jpg": {
+  "approved": true,
+  "sha256": "420f1e115db7315afa72a0c384b997f9c9619bbcef718b56f6156b3c1ab50d88",
+  "source": "v3 accepted"
+ },
+ "quilts_home.jpg": {
+  "approved": true,
+  "sha256": "ce9afc863d2c1b6d303df41cc0e84bb4be9fd081f8064f80613eefdb7996a496",
+  "source": "v3 accepted"
+ },
+ "quilts_inferno.jpg": {
+  "approved": true,
+  "sha256": "3df2564f08d7654d4dcec176c13a7c3cb608f7614ca92aca9b0ebf62c2c224a8",
+  "source": "v3 accepted"
+ },
+ "quilts_letters.jpg": {
+  "approved": true,
+  "sha256": "de20f1da3b81df49dc8b0445119d3dac7fdcb70a52dc33ab213044e106bc93b5",
+  "source": "v5 SHIP"
+ },
+ "quilts_mandalic.jpg": {
+  "approved": true,
+  "sha256": "853e77d720c56fb0279242df8e19ca7c0b81b266fbf417eb43687b8162ae4aea",
+  "source": "v4 SHIP"
+ },
+ "quilts_mourning_dove.jpg": {
+  "approved": true,
+  "sha256": "fc7e3fb468045b3ef47db27a5caa0236c0cdce66505af33e1dea917f9f7d3dc2",
+  "source": "v3 accepted"
+ },
+ "quilts_oceans_breath.jpg": {
+  "approved": false,
+  "sha256": "0009104261af209bb4d26252b89810b08df9954dae3c3f6afe42a47770152441",
+  "why": "studio photograph on a light wall; Original photos only until a museum version ships"
+ },
+ "quilts_pilsburys_best.jpg": {
+  "approved": true,
+  "sha256": "5286b1b9531db38afbe144fbd0ce1909377c2078a241789c2adea328d038b8d1",
+  "source": "v3 accepted"
+ },
+ "quilts_portals.jpg": {
+  "approved": true,
+  "sha256": "4f6a6d56b74c6392f1bc9d0abc4ec297dd9f78fcea8d640f910e16937123ce82",
+  "source": "v4 SHIP"
+ },
+ "quilts_rust_reverence.jpg": {
+  "approved": true,
+  "sha256": "5720644a318f30abff68bdf98cd20b175ade65990cb4324757e4c7e7f5785316",
+  "source": "v4 SHIP"
+ },
+ "quilts_treasures.jpg": {
+  "approved": true,
+  "sha256": "765a94ff8bcabe6fad132d208c92ab79d933f5b69b337f2248cb0d5c45a3f109",
+  "source": "v3 accepted"
+ },
+ "quilts_unraveling.jpg": {
+  "approved": true,
+  "sha256": "05ceb0599bf3d9249007ecf813754fb102db17b0272ee60a388103b5e8b4ac72",
+  "source": "v3 accepted"
+ },
+ "spats_creepybaby.jpg": {
+  "approved": true,
+  "sha256": "24f9a2cfbb9dc8bf99d10eaecccc5c213033c61dc5e2e8298c6d6536b1ff2897",
+  "source": "v3 accepted"
+ },
+ "spats_laceboot.jpg": {
+  "approved": true,
+  "sha256": "0658c97820ce4f571cddf057ebea9451900c430cbcc4bd0d7d6f9ca67b339a11",
+  "source": "v3 accepted"
+ },
+ "spats_redboots.jpg": {
+  "approved": true,
+  "sha256": "6a5c307a138fa15e3b1b2acfcb0c234de059fe281ece2f0933d9829d5be77512",
+  "source": "v3 accepted"
+ },
+ "spats_spats-1.jpg": {
+  "approved": true,
+  "sha256": "f3ecb9bbd78c05cb9437e531f375e35b65e5356b7062a190e1e911954fa93324",
+  "source": "v3 accepted"
+ },
+ "spats_spats-4.jpg": {
+  "approved": true,
+  "sha256": "a033faa2c747799e952094178535fe2cd4add21456971b3b2da40c2e22613042",
+  "source": "v3 accepted"
+ },
+ "spats_spats.jpg": {
+  "approved": true,
+  "sha256": "668a29c40dd39f86c2a8a69615fa7d1a2cdf4bb7242ba8464107ce1f81f6b086",
+  "source": "v4 SHIP"
+ },
+ "station_alien.jpg": {
+  "approved": true,
+  "sha256": "ee131efc59c8668ca4bdd58380a2e097cc3412fa8e3e08cd9d3abd76b9e353ab",
+  "source": "kept as photographed"
+ },
+ "station_yoyo-gown.jpg": {
+  "approved": true,
+  "sha256": "8a4c830604aba4a3e8231b7dc7875390468fe0c8d3ae36e853c592eb57dc7881",
+  "source": "kept as photographed"
+ },
+ "wearable_all-tied-up_back.jpg": {
+  "approved": true,
+  "sha256": "b8e29fd6ee4eb3e44222e3d380c4dc692a59f99ef162200e602bf7eaafc76d5f",
+  "source": "v3 accepted"
+ },
+ "wearable_all-tied-up_front.jpg": {
+  "approved": true,
+  "sha256": "1484b80f387adbaacc027a42cfa6be11c67e283f646caec1e6815c9beec1f69b",
+  "source": "v3 accepted"
+ },
+ "wearable_anjabass.jpg": {
+  "approved": false,
+  "sha256": "c51ef43324566ececb70201d9d9429565a5da07b4efbf9dd82c0c2d0911f3b51",
+  "why": "failed fidelity or recut in progress; original shown in Original mode only"
+ },
+ "wearable_attorney_lamb.jpg": {
+  "approved": true,
+  "sha256": "87679c7cb1b9bd851d9d0f1638ef34a167534124666139e0442d524c90fe9d71",
+  "source": "kept as photographed"
+ },
+ "wearable_aubry.jpg": {
+  "approved": false,
+  "sha256": "004443b38825f14cd95776028c0339eab8960a7234e420ebeccd9fc8ad057d67",
+  "why": "failed fidelity or recut in progress; original shown in Original mode only"
+ },
+ "wearable_best_back.jpg": {
+  "approved": false,
+  "sha256": "a2b0ec82f74ee92d9a763ca623b1025d8a161efa6a54301b39a0798938421cca",
+  "why": "failed fidelity or recut in progress; original shown in Original mode only"
+ },
+ "wearable_best_front.jpg": {
+  "approved": false,
+  "sha256": "182e0c32231c6df8164269e1841cedb2d1937ceb512f01d2c739073130c26fc3",
+  "why": "failed fidelity or recut in progress; original shown in Original mode only"
+ },
+ "wearable_biased-front.jpg": {
+  "approved": false,
+  "sha256": "dfa7166f319bcf64e05fe6aade825a921998cd449a3ab23cb9fa714d65f1f851",
+  "why": "failed fidelity or recut in progress; original shown in Original mode only"
+ },
+ "wearable_castle3-588.jpg": {
+  "approved": true,
+  "sha256": "9bda855bd29fb91e4c35ca2c5e1a70802487542254db07e8d6a861c8825b0c20",
+  "source": "kept as photographed"
+ },
+ "wearable_checkered.jpg": {
+  "approved": true,
+  "sha256": "457d4c8d6c167d31938fe1f7ba68465560298b8a1d16240ce24c88fca5f03e91",
+  "source": "kept as photographed"
+ },
+ "wearable_dressing_shame.jpg": {
+  "approved": true,
+  "sha256": "d3404d5063560687978632ae103dc0f6767ffc1c599a890acb7af0bd61ae07d6",
+  "source": "v3 accepted"
+ },
+ "wearable_eyes_back.jpg": {
+  "approved": false,
+  "sha256": "409cf677bee6db985ca86e5bf25ea852f5129f35f8857c116f220c7c0d3c653e",
+  "why": "failed fidelity or recut in progress; original shown in Original mode only"
+ },
+ "wearable_eyes_front.jpg": {
+  "approved": false,
+  "sha256": "cb7fafc668303c8200ffa8ccb1ce6013bdb63cbc1dabe476e0cbf9529e95b18e",
+  "why": "failed fidelity or recut in progress; original shown in Original mode only"
+ },
+ "wearable_louvre.jpg": {
+  "approved": true,
+  "sha256": "2823e6d32da32b99ebd32469c2beaad3ade14644ae5d95e61e6b0f1c807f5710",
+  "source": "kept as photographed"
+ },
+ "wearable_louvre2.jpg": {
+  "approved": true,
+  "sha256": "f7f3fb011af8a2c85bf8942667b0e06e3bc3da695d37eeed4343e27a3ac1dbb8",
+  "source": "kept as photographed"
+ },
+ "wearable_obey2020_front.jpg": {
+  "approved": true,
+  "sha256": "2421a815086ca49375bc12b79c97c1167903955b32c7becd6c764457a2ab61d4",
+  "source": "v3 accepted"
+ },
+ "wearable_pxl_full.jpg": {
+  "approved": false,
+  "sha256": "545169667c70172e04265f28396954c7e48a44429cb9c5e4aa07dbfcb7a3a184",
+  "why": "failed fidelity or recut in progress; original shown in Original mode only"
+ },
+ "wearable_read_my_lips.jpg": {
+  "approved": false,
+  "sha256": "816feabc56cd529efc94de7923b8c265875ede58f1aeb8dd1c9726826326806a",
+  "why": "failed fidelity or recut in progress; original shown in Original mode only"
+ },
+ "wearable_rhapsody.jpg": {
+  "approved": true,
+  "sha256": "43a60c9440bb9122dd21b9c0ea5123dc1121443c3e2d57b14650ce81cc13b603",
+  "source": "kept as photographed"
+ },
+ "wearable_tatiana.jpg": {
+  "approved": true,
+  "sha256": "cef0e3e4ab5389cb35d594946efcd58b8bd079651215abb00eea0a2bd6bbc343",
+  "source": "kept as photographed"
+ },
+ "wearable_yellow-woven_front.jpg": {
+  "approved": true,
+  "sha256": "0aff88a3b15a9ce2fda39bdfa1c845adf0ed0c70dbdc7911b49816a44672abe4",
+  "source": "v3 accepted"
+ }
+}

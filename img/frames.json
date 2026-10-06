@@ -1,0 +1,21 @@
+{
+  "_note": "Floor-to-back-wall junction in source pixels of a 1536x1024 frame, measured on wall-only side strips. Target common floor y=700 (68.36%).",
+  "sourceHeight": 1024,
+  "targetFloorY": 700,
+  "frames": {
+    "station-alien": 669,
+    "station-aliens2": 758,
+    "station-all-tied-up": 714,
+    "station-assemblage": 588,
+    "station-yoyo-gown": 651,
+    "station-five-years": 692,
+    "station-portals": 713,
+    "station-resilience": 697,
+    "station-st-lucia": 698,
+    "room-events": 680,
+    "room-entrance": 718,
+    "room-studio": 664,
+    "room-archive": 641,
+    "room-wardrobe": 662
+  }
+}

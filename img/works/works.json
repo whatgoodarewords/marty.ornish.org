@@ -1,0 +1,732 @@
+[
+ {
+  "file": "wearable_rhapsody.jpg",
+  "thumb": "t_wearable_rhapsody.jpg",
+  "w": 900,
+  "h": 791,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "rhapsody in white",
+  "station": null
+ },
+ {
+  "file": "wearable_pxl_full.jpg",
+  "thumb": "t_wearable_pxl_full.jpg",
+  "w": 536,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "full length",
+  "station": null
+ },
+ {
+  "file": "wearable_anjabass.jpg",
+  "thumb": "t_wearable_anjabass.jpg",
+  "w": 525,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "with bass",
+  "station": null
+ },
+ {
+  "file": "wearable_biased-front.jpg",
+  "thumb": "t_wearable_biased-front.jpg",
+  "w": 726,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "Shy Lisbeth",
+  "station": null
+ },
+ {
+  "file": "wearable_aubry.jpg",
+  "thumb": "t_wearable_aubry.jpg",
+  "w": 653,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "dress",
+  "station": null
+ },
+ {
+  "file": "wearable_castle3-588.jpg",
+  "thumb": "t_wearable_castle3-588.jpg",
+  "w": 900,
+  "h": 581,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "at the castle",
+  "station": null
+ },
+ {
+  "file": "wearable_tatiana.jpg",
+  "thumb": "t_wearable_tatiana.jpg",
+  "w": 600,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "Tatiana",
+  "station": null
+ },
+ {
+  "file": "wearable_checkered.jpg",
+  "thumb": "t_wearable_checkered.jpg",
+  "w": 900,
+  "h": 723,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "checkered history",
+  "station": null
+ },
+ {
+  "file": "wearable_obey2020_front.jpg",
+  "thumb": "t_wearable_obey2020_front.jpg",
+  "w": 605,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "love, honor, obey",
+  "station": null
+ },
+ {
+  "file": "wearable_eyes_front.jpg",
+  "thumb": "t_wearable_eyes_front.jpg",
+  "w": 552,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "St. Lucia eyes",
+  "station": "st-lucia"
+ },
+ {
+  "file": "wearable_eyes_back.jpg",
+  "thumb": "t_wearable_eyes_back.jpg",
+  "w": 536,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "St. Lucia eyes",
+  "station": null
+ },
+ {
+  "file": "wearable_dressing_shame.jpg",
+  "thumb": "t_wearable_dressing_shame.jpg",
+  "w": 900,
+  "h": 787,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "a dressing shame",
+  "station": null
+ },
+ {
+  "file": "wearable_louvre2.jpg",
+  "thumb": "t_wearable_louvre2.jpg",
+  "w": 900,
+  "h": 605,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "the Louvre",
+  "station": null
+ },
+ {
+  "file": "wearable_attorney_lamb.jpg",
+  "thumb": "t_wearable_attorney_lamb.jpg",
+  "w": 900,
+  "h": 782,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "Attorney Lamb",
+  "station": null
+ },
+ {
+  "file": "wearable_best_front.jpg",
+  "thumb": "t_wearable_best_front.jpg",
+  "w": 614,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "best front",
+  "station": null
+ },
+ {
+  "file": "wearable_best_back.jpg",
+  "thumb": "t_wearable_best_back.jpg",
+  "w": 708,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "best back",
+  "station": null
+ },
+ {
+  "file": "wearable_read_my_lips.jpg",
+  "thumb": "t_wearable_read_my_lips.jpg",
+  "w": 659,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "Read My Lips",
+  "station": null
+ },
+ {
+  "file": "wearable_yellow-woven_front.jpg",
+  "thumb": "t_wearable_yellow-woven_front.jpg",
+  "w": 585,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "Yellow, woven dress, front view",
+  "station": null
+ },
+ {
+  "file": "wearable_louvre.jpg",
+  "thumb": "t_wearable_louvre.jpg",
+  "w": 900,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "dancing on the Louvre",
+  "station": null
+ },
+ {
+  "file": "wearable_all-tied-up_front.jpg",
+  "thumb": "t_wearable_all-tied-up_front.jpg",
+  "w": 650,
+  "h": 900,
+  "series": "wearable",
+  "seriesLabel": "Wearable art",
+  "alt": "all tied up",
+  "station": "all-tied-up"
+ },
+ {
+  "file": "quilts_pilsburys_best.jpg",
+  "thumb": "t_quilts_pilsburys_best.jpg",
+  "w": 492,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "Pilsbury's Best",
+  "station": null
+ },
+ {
+  "file": "quilts_mourning_dove.jpg",
+  "thumb": "t_quilts_mourning_dove.jpg",
+  "w": 506,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "Still Life with Mourning Dove",
+  "station": null
+ },
+ {
+  "file": "quilts_burlesque.jpg",
+  "thumb": "t_quilts_burlesque.jpg",
+  "w": 744,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "burlesque noir",
+  "station": null
+ },
+ {
+  "file": "quilts_grow_up.jpg",
+  "thumb": "t_quilts_grow_up.jpg",
+  "w": 299,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "when I grow up",
+  "station": null
+ },
+ {
+  "file": "quilts_heart.jpg",
+  "thumb": "t_quilts_heart.jpg",
+  "w": 900,
+  "h": 898,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "",
+  "station": null
+ },
+ {
+  "file": "quilts_home.jpg",
+  "thumb": "t_quilts_home.jpg",
+  "w": 597,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "no place like home",
+  "station": null
+ },
+ {
+  "file": "quilts_letters.jpg",
+  "thumb": "t_quilts_letters.jpg",
+  "w": 761,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "weight of letters",
+  "station": null
+ },
+ {
+  "file": "quilts_oceans_breath.jpg",
+  "thumb": "t_quilts_oceans_breath.jpg",
+  "w": 815,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "ocean's breath",
+  "station": null
+ },
+ {
+  "file": "quilts_portals.jpg",
+  "thumb": "t_quilts_portals.jpg",
+  "w": 457,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "portals of love",
+  "station": "portals"
+ },
+ {
+  "file": "quilts_rust_reverence.jpg",
+  "thumb": "t_quilts_rust_reverence.jpg",
+  "w": 372,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "rust & reverence",
+  "station": null
+ },
+ {
+  "file": "quilts_treasures.jpg",
+  "thumb": "t_quilts_treasures.jpg",
+  "w": 324,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "tiny treasures",
+  "station": null
+ },
+ {
+  "file": "quilts_unraveling.jpg",
+  "thumb": "t_quilts_unraveling.jpg",
+  "w": 900,
+  "h": 693,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "unraveling",
+  "station": null
+ },
+ {
+  "file": "quilts_archetypes.jpg",
+  "thumb": "t_quilts_archetypes.jpg",
+  "w": 606,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "archetypes in gold & brown",
+  "station": null
+ },
+ {
+  "file": "quilts_cries.jpg",
+  "thumb": "t_quilts_cries.jpg",
+  "w": 892,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "cries beneath the waves",
+  "station": null
+ },
+ {
+  "file": "quilts_esmerelda.jpg",
+  "thumb": "t_quilts_esmerelda.jpg",
+  "w": 675,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "Esmerelda's passage",
+  "station": null
+ },
+ {
+  "file": "quilts_barbie.jpg",
+  "thumb": "t_quilts_barbie.jpg",
+  "w": 900,
+  "h": 896,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "Barbie's nightmare",
+  "station": null
+ },
+ {
+  "file": "quilts_cravings.jpg",
+  "thumb": "t_quilts_cravings.jpg",
+  "w": 622,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "hidden cravings",
+  "station": null
+ },
+ {
+  "file": "quilts_five_years.jpg",
+  "thumb": "t_quilts_five_years.jpg",
+  "w": 522,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "five years",
+  "station": "five-years"
+ },
+ {
+  "file": "quilts_brillo.jpg",
+  "thumb": "t_quilts_brillo.jpg",
+  "w": 419,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "brillo on the brain",
+  "station": null
+ },
+ {
+  "file": "quilts_inferno.jpg",
+  "thumb": "t_quilts_inferno.jpg",
+  "w": 900,
+  "h": 730,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "Ankh's inferno",
+  "station": null
+ },
+ {
+  "file": "quilts_entropy.jpg",
+  "thumb": "t_quilts_entropy.jpg",
+  "w": 829,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "entropy",
+  "station": null
+ },
+ {
+  "file": "quilts_mandalic.jpg",
+  "thumb": "t_quilts_mandalic.jpg",
+  "w": 611,
+  "h": 900,
+  "series": "quilts",
+  "seriesLabel": "Art quilts",
+  "alt": "entropy",
+  "station": null
+ },
+ {
+  "file": "3d_glasses.jpg",
+  "thumb": "t_3d_glasses.jpg",
+  "w": 900,
+  "h": 729,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "glasses",
+  "station": null
+ },
+ {
+  "file": "3d_sewing_machine.jpg",
+  "thumb": "t_3d_sewing_machine.jpg",
+  "w": 900,
+  "h": 709,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "sewing machine",
+  "station": null
+ },
+ {
+  "file": "3d_typewriter.jpg",
+  "thumb": "t_3d_typewriter.jpg",
+  "w": 900,
+  "h": 690,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "assemblege",
+  "station": "assemblage"
+ },
+ {
+  "file": "3d_aliens2.jpg",
+  "thumb": "t_3d_aliens2.jpg",
+  "w": 883,
+  "h": 900,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "aliens",
+  "station": "aliens2"
+ },
+ {
+  "file": "3d_aliens2_detail.jpg",
+  "thumb": "t_3d_aliens2_detail.jpg",
+  "w": 830,
+  "h": 900,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "aliens detail",
+  "station": null
+ },
+ {
+  "file": "3d_aliens_group.jpg",
+  "thumb": "t_3d_aliens_group.jpg",
+  "w": 900,
+  "h": 556,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "aliens group",
+  "station": null
+ },
+ {
+  "file": "3d_chubby_alien.jpg",
+  "thumb": "t_3d_chubby_alien.jpg",
+  "w": 900,
+  "h": 711,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "chubby_alien",
+  "station": null
+ },
+ {
+  "file": "3d_fold.jpg",
+  "thumb": "t_3d_fold.jpg",
+  "w": 900,
+  "h": 823,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "in the fold",
+  "station": null
+ },
+ {
+  "file": "3d_resilience.jpg",
+  "thumb": "t_3d_resilience.jpg",
+  "w": 511,
+  "h": 900,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "altar of resilience",
+  "station": "resilience"
+ },
+ {
+  "file": "3d_turn-on.jpg",
+  "thumb": "t_3d_turn-on.jpg",
+  "w": 594,
+  "h": 900,
+  "series": "3d",
+  "seriesLabel": "3D and assemblage",
+  "alt": "you turn me on",
+  "station": null
+ },
+ {
+  "file": "jackets_1920a.jpg",
+  "thumb": "t_jackets_1920a.jpg",
+  "w": 643,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket1920",
+  "station": null
+ },
+ {
+  "file": "jackets_1920b.jpg",
+  "thumb": "t_jackets_1920b.jpg",
+  "w": 591,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket1920",
+  "station": null
+ },
+ {
+  "file": "jackets_1940a.jpg",
+  "thumb": "t_jackets_1940a.jpg",
+  "w": 690,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket1940",
+  "station": null
+ },
+ {
+  "file": "jackets_1940b.jpg",
+  "thumb": "t_jackets_1940b.jpg",
+  "w": 698,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket1940",
+  "station": null
+ },
+ {
+  "file": "jackets_2792.jpg",
+  "thumb": "t_jackets_2792.jpg",
+  "w": 695,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket2792",
+  "station": null
+ },
+ {
+  "file": "jackets_2793.jpg",
+  "thumb": "t_jackets_2793.jpg",
+  "w": 699,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket2793",
+  "station": null
+ },
+ {
+  "file": "jackets_2913.jpg",
+  "thumb": "t_jackets_2913.jpg",
+  "w": 582,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket2913",
+  "station": null
+ },
+ {
+  "file": "jackets_2914.jpg",
+  "thumb": "t_jackets_2914.jpg",
+  "w": 556,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket2914",
+  "station": null
+ },
+ {
+  "file": "jackets_jacket.jpg",
+  "thumb": "t_jackets_jacket.jpg",
+  "w": 674,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "suave jacket guy",
+  "station": null
+ },
+ {
+  "file": "jackets_2829.jpg",
+  "thumb": "t_jackets_2829.jpg",
+  "w": 765,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket2829",
+  "station": null
+ },
+ {
+  "file": "jackets_2831.jpg",
+  "thumb": "t_jackets_2831.jpg",
+  "w": 743,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "jacket2831",
+  "station": null
+ },
+ {
+  "file": "jackets_black_bussle1.jpg",
+  "thumb": "t_jackets_black_bussle1.jpg",
+  "w": 680,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "black_bussle",
+  "station": null
+ },
+ {
+  "file": "jackets_black_bussle2.jpg",
+  "thumb": "t_jackets_black_bussle2.jpg",
+  "w": 628,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "black_bussle2",
+  "station": null
+ },
+ {
+  "file": "jackets_peacock1.jpg",
+  "thumb": "t_jackets_peacock1.jpg",
+  "w": 707,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "peacock jacket",
+  "station": null
+ },
+ {
+  "file": "jackets_peacock2.jpg",
+  "thumb": "t_jackets_peacock2.jpg",
+  "w": 707,
+  "h": 900,
+  "series": "jackets",
+  "seriesLabel": "Jackets",
+  "alt": "peacock jacket",
+  "station": null
+ },
+ {
+  "file": "spats_redboots.jpg",
+  "thumb": "t_spats_redboots.jpg",
+  "w": 900,
+  "h": 899,
+  "series": "spats",
+  "seriesLabel": "Spats and boots",
+  "alt": "red boots",
+  "station": null
+ },
+ {
+  "file": "spats_creepybaby.jpg",
+  "thumb": "t_spats_creepybaby.jpg",
+  "w": 900,
+  "h": 597,
+  "series": "spats",
+  "seriesLabel": "Spats and boots",
+  "alt": "creepy baby",
+  "station": null
+ },
+ {
+  "file": "spats_spats.jpg",
+  "thumb": "t_spats_spats.jpg",
+  "w": 635,
+  "h": 900,
+  "series": "spats",
+  "seriesLabel": "Spats and boots",
+  "alt": "spats",
+  "station": null
+ },
+ {
+  "file": "spats_laceboot.jpg",
+  "thumb": "t_spats_laceboot.jpg",
+  "w": 705,
+  "h": 900,
+  "series": "spats",
+  "seriesLabel": "Spats and boots",
+  "alt": "lace boots",
+  "station": null
+ },
+ {
+  "file": "spats_spats-1.jpg",
+  "thumb": "t_spats_spats-1.jpg",
+  "w": 736,
+  "h": 900,
+  "series": "spats",
+  "seriesLabel": "Spats and boots",
+  "alt": "spats",
+  "station": null
+ },
+ {
+  "file": "spats_spats-4.jpg",
+  "thumb": "t_spats_spats-4.jpg",
+  "w": 707,
+  "h": 900,
+  "series": "spats",
+  "seriesLabel": "Spats and boots",
+  "alt": "spats",
+  "station": null
+ }
+]
