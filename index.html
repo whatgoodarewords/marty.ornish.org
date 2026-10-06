@@ -638,6 +638,73 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
 }
 .menu:focus { outline: none; }
 .room-work.over-art, .room-work.over-art .zone { cursor: zoom-in; }
+
+/* ===== Round 9: the in-room close-up and the paper wall label (addendum sections 4, 5, 7). ===== */
+/* The wall label: a mounted card, 10 cm wide on the wall, laid out at 300 px and scaled into the station's picture
+   plane (placeLabel). Warm off-white stock with a fibre texture, ink that sits on the paper, a card edge whose top
+   catches the spotlight, a soft contact shadow down and right, and the brightness and warmth of the wall's light at
+   that spot (--lb, --lt from scene_r9.py). It never fades or moves on its own. */
+:root { --fibre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75 0.06' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .37 0 0 0 0 .30 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .40 0 0 0 0 .33 0 0 0 .12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); }
+.wlabel { position: absolute; left: 0; top: 0; z-index: 2; width: 300px; transform-origin: 0 0; pointer-events: none;
+  filter: brightness(var(--lb, .8)); -webkit-user-select: none; user-select: none; }
+.wlabel::before { content: ""; position: absolute; inset: 0; z-index: -1;               /* the card's edge: about 4 mm of board */
+  transform: translate(3px, 6px); background: linear-gradient(to bottom, #b8ad9b, #8d8373); border-radius: 1px;
+  box-shadow: 10px 18px 26px rgba(0,0,0,.55), 4px 6px 7px rgba(0,0,0,.45); }
+.wl-paper { position: relative; min-height: 360px; padding: 26px 24px 20px; border-radius: 1px; color: #2d2823;
+  background-color: #ebe3d3; background-image: var(--fibre), radial-gradient(130% 90% at 30% 0%, rgba(255,250,238,.55), rgba(255,250,238,0) 70%);
+  box-shadow: inset 0 3px 0 rgba(255,252,242,.85), inset 0 -2px 0 rgba(120,108,90,.25);
+  text-shadow: 0 0 .7px rgba(45,40,35,.45); }
+.wl-paper::after { content: ""; position: absolute; inset: 0; background: var(--lt, #fff); mix-blend-mode: multiply; pointer-events: none; border-radius: 1px; }
+.wl-t { font-family: var(--title-font); font-size: 24px; line-height: 1.08; letter-spacing: -.004em; color: #26211c; }
+.wl-d, .wl-a, .wl-o, .wl-act { margin-top: 10px; font-size: 14px; line-height: 1.42; color: #3d362f; }
+.wl-o:empty, .wl-o[hidden] { display: none; }
+.wl-act { margin-top: 14px; }
+.wl-act span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgba(45,40,35,.45); }
+.wall-label { display: none !important; }                       /* the r8 floating card is retired */
+@media (max-width: 760px) { .room-work .caption { display: none !important; } }   /* so is the phone's bottom plate */
+/* The gallery's own controls sit in the lower left at both sizes, light on the room. */
+@media (max-width: 760px) {
+  .work-tools { left: var(--gutter); bottom: calc(var(--bottom) + 22px); }
+  .work-tools .tool { color: var(--label); text-decoration: none; border-bottom: 1px solid var(--rule); min-height: 44px; }
+  .work-tools::before { display: block; }
+}
+#labelTarget { pointer-events: none; }
+#labelTarget:focus-visible { outline: 1px solid var(--white); outline-offset: 4px; }
+/* The close-up: no dark scrim, only the edges dim a little as the camera closes in; the art layer over the plate. */
+.walkup { background: none; }
+.wu-scrim { background: radial-gradient(120% 95% at 50% 46%, rgba(0,0,0,0) 52%, rgba(0,0,0,.42) 100%); opacity: 0; pointer-events: auto; }
+.wu-art { position: fixed; left: 0; top: 0; z-index: 0; pointer-events: none; image-rendering: auto; -webkit-user-drag: none; user-select: none; }
+.wu-art[hidden] { display: none; }
+.wu-wall { position: fixed; inset: 0; z-index: 1; background-color: #211f1c; background-image: var(--grain), var(--wallpage); }
+.wu-wall[hidden] { display: none; }
+.wu-frame { z-index: 2; }
+.wu-loupe { z-index: 3; }
+.walkup.over-art { cursor: zoom-in; }
+.walkup.over-label { cursor: zoom-in; }
+.wu-link { position: fixed; z-index: 4; font-size: 0; color: transparent; background: transparent; border: 0; cursor: pointer; }
+.wu-link[hidden] { display: none; }
+.wu-link:focus-visible { outline: 1px solid #2d2823; outline-offset: 2px; }
+.wu-link.copied::after { content: "Copied"; position: absolute; left: 0; top: 100%; font-size: 13px; color: var(--white); }
+.wu-tools { left: var(--gutter); }
+.wu-views { display: inline-flex; gap: 14px; margin-left: 10px; padding-left: 14px; border-left: 1px solid var(--rule); }
+.wu-views[hidden] { display: none; }
+.wu-prev { left: calc(var(--gutter) - 12px); }
+.wu-next { right: calc(var(--gutter) - 12px); }
+@media (max-width: 760px) { .wu-tools { left: var(--gutter); bottom: calc(var(--bottom) + 18px); flex-wrap: wrap; row-gap: 0; } .wu-views { margin-left: 0; padding-left: 0; border-left: 0; } }
+/* Works without a station keep the viewer and the plate, on the museum wall, never on black. */
+.viewer, .plate { background-color: #211f1c; background-image: var(--grain), var(--wallpage); }
+/* Walked up, the header (logo, switch, Menu) stays above every picture layer, and the Menu opens above the close-up. */
+html.walked-up .top { z-index: 47; }
+html.walked-up .menu { z-index: 46; }
+.wlabel.wl-over { position: fixed; z-index: 1; will-change: auto; }
+.wlabel.wl-over[hidden] { display: none; }
+/* The close-up's controls stay readable over any part of a picture. */
+.wu-back, .wu-tool, .wu-nav { text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 14px rgba(0,0,0,.75); }
+.wu-tools { isolation: isolate; }
+.wu-tools::before { content: ""; position: absolute; z-index: -1; inset: -18px -40px -14px -30px; background: radial-gradient(closest-side, rgba(0,0,0,.72), rgba(0,0,0,0)); pointer-events: none; }
+.wu-back::after { content: ""; position: absolute; z-index: -1; inset: -10px -30px; background: radial-gradient(closest-side, rgba(0,0,0,.6), rgba(0,0,0,0)); pointer-events: none; }
+.walkup.under-menu .wu-tools, .walkup.under-menu .wu-back, .walkup.under-menu .wu-nav, .walkup.under-menu .wu-link { visibility: hidden; }
 </style>
 
 <header class="top">
@@ -684,6 +751,8 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
       <a class="cap-onview" id="capOnView" href="#exhibitions" data-room="exhibitions" hidden></a>
     </div>
     <button class="art-target" id="artTarget" type="button" hidden>Look closely at this work</button>
+    <button class="art-target" id="labelTarget" type="button" aria-describedby="stationDesc" hidden>Read the label</button>
+    <p class="sr" id="stationDesc"></p>
     <div class="work-tools" id="workTools">
       <button class="tool" id="lookBtn" type="button">Look closely</button>
       <button class="tool" id="linkBtn" type="button">Copy link</button>
@@ -765,28 +834,22 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
   <button class="viewer-close" id="viewerClose" type="button">Close</button>
 </div>
 
-<div class="walkup" id="walkup" role="dialog" aria-modal="true" aria-labelledby="wuTitle" hidden>
+<div class="walkup" id="walkup" role="dialog" aria-modal="true" aria-labelledby="wuTitle" aria-describedby="stationDesc" hidden>
+  <h2 class="sr" id="wuTitle" tabindex="-1"></h2>
   <div class="wu-scrim" id="wuScrim"></div>
   <div class="wu-stage" id="wuStage">
+    <img class="wu-art" id="wuArt" alt="" aria-hidden="true" decoding="async" draggable="false" hidden>
+    <div class="wu-wall" id="wuWall" hidden></div>
     <div class="wu-frame" id="wuFrame" hidden><img class="wu-img" id="wuImg" alt="" decoding="async" draggable="false"><img class="wu-img wu-ph" id="wuPh" alt="" aria-hidden="true" hidden></div>
     <div class="wu-loupe" id="wuLoupe" aria-hidden="true" hidden></div>
     <p class="photo-status wu-status" id="wuStatus" role="status" hidden><span>Loading</span> <button class="tool" type="button" hidden>Try again</button></p>
   </div>
-  <div class="wu-label card" id="wuLabel" hidden>
-    <h2 class="wu-title" id="wuTitle" tabindex="-1"></h2>
-    <p class="wu-detail" id="wuDetail"></p>
-    <p class="wu-award" id="wuAward"></p>
-    <p class="photo-note" id="wuNote" hidden></p>
-    <p class="onview-line"><a class="inline-link onview" id="wuOnView" href="#exhibitions" data-room="exhibitions" hidden></a></p>
-    <div class="wu-views" id="wuViews" role="group" aria-label="Views"></div>
-    <p class="card-actions wu-actions"><button class="tool" id="wuLink" type="button">Copy link</button></p>
-    <button class="wu-expand" id="wuExpand" type="button" aria-expanded="false">Details</button>
-  </div>
-  <div class="wu-tools" id="wuTools" role="group" aria-label="Photograph" hidden>
+  <button class="wu-link" id="wuLink" type="button" hidden>Copy link</button>
+  <div class="wu-tools" id="wuTools" role="group" aria-label="Close-up" hidden>
     <button class="wu-tool" id="wuZoomOut" type="button">Zoom out</button>
     <button class="wu-tool" id="wuZoomIn" type="button">Zoom in</button>
-    <button class="wu-tool" id="wuFit" type="button">Fit</button>
-    <button class="wu-tool" id="wuLoupeBtn" type="button" aria-pressed="false">Loupe</button>
+    <button class="wu-tool" id="wuLoupeBtn" type="button" aria-pressed="false">Magnifier</button>
+    <span class="wu-views" id="wuViews" role="group" aria-label="Photographs" hidden></span>
   </div>
   <button class="wu-back" id="wuBack" type="button" hidden>Back to gallery</button>
   <button class="wu-nav wu-prev" id="wuPrev" type="button" aria-label="Previous work" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 L7 12 L15 20" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></button>
@@ -1008,6 +1071,64 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               ]
             }
           }
+        },
+        "art9": {
+          "land": {
+            "src": "img/art/all-tied-up-landscape.webp?v=83f97301",
+            "w": 686,
+            "h": 900,
+            "rect": [
+              0.323568,
+              0.097656,
+              0.362472,
+              0.71332
+            ]
+          },
+          "port": {
+            "src": "img/art/all-tied-up-portrait.webp?v=a8c1240b",
+            "w": 686,
+            "h": 900,
+            "rect": [
+              0.304688,
+              0.152995,
+              0.409233,
+              0.536895
+            ]
+          }
+        },
+        "view": 1,
+        "wallCm": null,
+        "label9": {
+          "land": {
+            "x": 0.61215,
+            "cy": 0.39039,
+            "w": 0.02625,
+            "h": 0.04724,
+            "bright": 0.889,
+            "tint": [
+              1.0,
+              1.0,
+              0.982
+            ],
+            "wallLum": 32.2
+          },
+          "port": {
+            "x": 0.62996,
+            "cy": 0.37366,
+            "w": 0.02893,
+            "h": 0.03471,
+            "bright": 0.857,
+            "tint": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "wallLum": 27.1
+          }
+        },
+        "labelEdge": {
+          "land": null,
+          "port": null
         }
       },
       {
@@ -1113,6 +1234,64 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               ]
             }
           }
+        },
+        "art9": {
+          "land": {
+            "src": "img/art/five-years-landscape.webp?v=4845ec45",
+            "w": 580,
+            "h": 1000,
+            "rect": [
+              0.395182,
+              0.073242,
+              0.197827,
+              0.511621
+            ]
+          },
+          "port": {
+            "src": "img/art/five-years-portrait.webp?v=6052447f",
+            "w": 580,
+            "h": 1000,
+            "rect": [
+              0.317708,
+              0.057292,
+              0.357855,
+              0.616992
+            ]
+          }
+        },
+        "view": 0,
+        "wallCm": null,
+        "label9": {
+          "land": {
+            "x": 0.60425,
+            "cy": 0.2893,
+            "w": 0.02625,
+            "h": 0.04724,
+            "bright": 0.863,
+            "tint": [
+              1.0,
+              0.999,
+              0.981
+            ],
+            "wallLum": 28.1
+          },
+          "port": {
+            "x": 0.68666,
+            "cy": 0.3188,
+            "w": 0.02893,
+            "h": 0.03471,
+            "bright": 0.849,
+            "tint": [
+              1.0,
+              1.0,
+              0.998
+            ],
+            "wallLum": 25.9
+          }
+        },
+        "labelEdge": {
+          "land": null,
+          "port": null
         }
       },
       {
@@ -1238,6 +1417,64 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               ]
             }
           }
+        },
+        "art9": {
+          "land": {
+            "src": "img/art/resilience-landscape.webp?v=1e2ad6e6",
+            "w": 568,
+            "h": 1000,
+            "rect": [
+              0.35026,
+              -0.00293,
+              0.281596,
+              0.743652
+            ]
+          },
+          "port": {
+            "src": "img/art/resilience-portrait.webp?v=e045c172",
+            "w": 568,
+            "h": 1000,
+            "rect": [
+              0.305339,
+              0.050781,
+              0.377927,
+              0.665365
+            ]
+          }
+        },
+        "view": 0,
+        "wallCm": null,
+        "label9": {
+          "land": {
+            "x": 0.62575,
+            "cy": 0.29942,
+            "w": 0.02625,
+            "h": 0.04724,
+            "bright": 0.867,
+            "tint": [
+              1.0,
+              1.0,
+              0.993
+            ],
+            "wallLum": 28.7
+          },
+          "port": {
+            "x": 0.67166,
+            "cy": 0.31985,
+            "w": 0.02893,
+            "h": 0.03471,
+            "bright": 0.833,
+            "tint": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "wallLum": 23.3
+          }
+        },
+        "labelEdge": {
+          "land": null,
+          "port": null
         }
       },
       {
@@ -1335,6 +1572,64 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               "view": 0
             }
           }
+        },
+        "art9": {
+          "land": {
+            "src": "img/art/alien-landscape.webp?v=737abcf0",
+            "w": 686,
+            "h": 900,
+            "rect": [
+              0.277344,
+              -0.011719,
+              0.425043,
+              0.836455
+            ]
+          },
+          "port": {
+            "src": "img/art/alien-portrait.webp?v=c50c55d5",
+            "w": 686,
+            "h": 900,
+            "rect": [
+              0.301432,
+              0.170573,
+              0.39847,
+              0.522773
+            ]
+          }
+        },
+        "view": 0,
+        "wallCm": null,
+        "label9": {
+          "land": {
+            "x": 0.70915,
+            "cy": 0.35698,
+            "w": 0.02625,
+            "h": 0.04724,
+            "bright": 0.797,
+            "tint": [
+              1.0,
+              1.0,
+              0.991
+            ],
+            "wallLum": 17.7
+          },
+          "port": {
+            "x": 0.70816,
+            "cy": 0.40071,
+            "w": 0.02893,
+            "h": 0.03471,
+            "bright": 0.785,
+            "tint": [
+              1.0,
+              1.0,
+              0.986
+            ],
+            "wallLum": 15.9
+          }
+        },
+        "labelEdge": {
+          "land": null,
+          "port": null
         }
       },
       {
@@ -1440,6 +1735,64 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               ]
             }
           }
+        },
+        "art9": {
+          "land": {
+            "src": "img/art/portals-landscape.webp?v=4a3a24a2",
+            "w": 508,
+            "h": 1000,
+            "rect": [
+              0.380208,
+              0.025391,
+              0.22311,
+              0.658789
+            ]
+          },
+          "port": {
+            "src": "img/art/portals-portrait.webp?v=b4e5acd8",
+            "w": 508,
+            "h": 1000,
+            "rect": [
+              0.369792,
+              0.083333,
+              0.250329,
+              0.492773
+            ]
+          }
+        },
+        "view": 0,
+        "wallCm": null,
+        "label9": {
+          "land": {
+            "x": 0.61145,
+            "cy": 0.30024,
+            "w": 0.02625,
+            "h": 0.04724,
+            "bright": 0.895,
+            "tint": [
+              1.0,
+              0.995,
+              0.984
+            ],
+            "wallLum": 33.2
+          },
+          "port": {
+            "x": 0.62866,
+            "cy": 0.2892,
+            "w": 0.02893,
+            "h": 0.03471,
+            "bright": 0.885,
+            "tint": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "wallLum": 31.6
+          }
+        },
+        "labelEdge": {
+          "land": null,
+          "port": null
         }
       },
       {
@@ -1537,6 +1890,64 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               "view": 0
             }
           }
+        },
+        "art9": {
+          "land": {
+            "src": "img/art/yoyo-gown-landscape.webp?v=e283881f",
+            "w": 686,
+            "h": 900,
+            "rect": [
+              0.246745,
+              0.158203,
+              0.396336,
+              0.779962
+            ]
+          },
+          "port": {
+            "src": "img/art/yoyo-gown-portrait.webp?v=dc3e1cb0",
+            "w": 686,
+            "h": 900,
+            "rect": [
+              0.255859,
+              0.244141,
+              0.436853,
+              0.573131
+            ]
+          }
+        },
+        "view": 0,
+        "wallCm": 198.1,
+        "label9": {
+          "land": {
+            "x": 0.65702,
+            "cy": 0.49675,
+            "w": 0.02625,
+            "h": 0.04724,
+            "bright": 0.827,
+            "tint": [
+              1.0,
+              1.0,
+              0.958
+            ],
+            "wallLum": 22.5
+          },
+          "port": {
+            "x": 0.70602,
+            "cy": 0.49282,
+            "w": 0.02893,
+            "h": 0.03471,
+            "bright": 0.794,
+            "tint": [
+              1.0,
+              1.0,
+              0.965
+            ],
+            "wallLum": 17.2
+          }
+        },
+        "labelEdge": {
+          "land": 0.6413,
+          "port": 0.6887
         }
       },
       {
@@ -1650,6 +2061,64 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               "view": 1
             }
           }
+        },
+        "art9": {
+          "land": {
+            "src": "img/art/aliens2-landscape.webp?v=7f6a5f7e",
+            "w": 981,
+            "h": 1000,
+            "rect": [
+              0.236979,
+              0.069336,
+              0.379435,
+              0.580176
+            ]
+          },
+          "port": {
+            "src": "img/art/aliens2-portrait.webp?v=cd1bad23",
+            "w": 981,
+            "h": 1000,
+            "rect": [
+              0.15625,
+              0.178385,
+              0.500016,
+              0.509701
+            ]
+          }
+        },
+        "view": 0,
+        "wallCm": null,
+        "label9": {
+          "land": {
+            "x": 0.58605,
+            "cy": 0.31157,
+            "w": 0.02625,
+            "h": 0.04724,
+            "bright": 0.969,
+            "tint": [
+              1.0,
+              0.998,
+              0.977
+            ],
+            "wallLum": 44.9
+          },
+          "port": {
+            "x": 0.61376,
+            "cy": 0.39129,
+            "w": 0.02893,
+            "h": 0.03471,
+            "bright": 0.853,
+            "tint": [
+              1.0,
+              1.0,
+              0.994
+            ],
+            "wallLum": 26.5
+          }
+        },
+        "labelEdge": {
+          "land": null,
+          "port": null
         }
       },
       {
@@ -1756,6 +2225,64 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               "view": 0
             }
           }
+        },
+        "art9": {
+          "land": {
+            "src": "img/art/st-lucia-landscape.webp?v=3d062b77",
+            "w": 686,
+            "h": 900,
+            "rect": [
+              0.376302,
+              0.068359,
+              0.245638,
+              0.483398
+            ]
+          },
+          "port": {
+            "src": "img/art/st-lucia-portrait.webp?v=438a86bf",
+            "w": 686,
+            "h": 900,
+            "rect": [
+              0.330729,
+              0.10612,
+              0.348359,
+              0.457031
+            ]
+          }
+        },
+        "view": -1,
+        "wallCm": null,
+        "label9": {
+          "land": {
+            "x": 0.59385,
+            "cy": 0.27548,
+            "w": 0.02625,
+            "h": 0.04724,
+            "bright": 0.858,
+            "tint": [
+              1.0,
+              0.999,
+              0.976
+            ],
+            "wallLum": 27.4
+          },
+          "port": {
+            "x": 0.63456,
+            "cy": 0.30264,
+            "w": 0.02893,
+            "h": 0.03471,
+            "bright": 0.839,
+            "tint": [
+              1.0,
+              0.989,
+              0.953
+            ],
+            "wallLum": 24.3
+          }
+        },
+        "labelEdge": {
+          "land": null,
+          "port": null
         }
       },
       {
@@ -1867,6 +2394,64 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               "view": 0
             }
           }
+        },
+        "art9": {
+          "land": {
+            "src": "img/art/assemblage-landscape.webp?v=9af95925",
+            "w": 1304,
+            "h": 1000,
+            "rect": [
+              0.369792,
+              0.180664,
+              0.256301,
+              0.294824
+            ]
+          },
+          "port": {
+            "src": "img/art/assemblage-portrait.webp?v=0f847d78",
+            "w": 1304,
+            "h": 1000,
+            "rect": [
+              0.348307,
+              0.245443,
+              0.313011,
+              0.240039
+            ]
+          }
+        },
+        "view": 0,
+        "wallCm": null,
+        "label9": {
+          "land": {
+            "x": 0.62445,
+            "cy": 0.30709,
+            "w": 0.02625,
+            "h": 0.04724,
+            "bright": 0.865,
+            "tint": [
+              1.0,
+              0.994,
+              0.968
+            ],
+            "wallLum": 28.5
+          },
+          "port": {
+            "x": 0.65736,
+            "cy": 0.34838,
+            "w": 0.02893,
+            "h": 0.03471,
+            "bright": 0.827,
+            "tint": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "wallLum": 22.4
+          }
+        },
+        "labelEdge": {
+          "land": null,
+          "port": null
         }
       }
     ],
@@ -3006,6 +3591,12 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
           "wearable_rhapsody.jpg",
           "wearable_tatiana.jpg"
         ]
+      },
+      "mq_h0": {
+        "path": "img/works-mq-h0/"
+      },
+      "mq_h1": {
+        "path": "img/works-mq-h1/"
       }
     },
     "photoVariants": {
@@ -3366,8 +3957,8 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
       "wearable_aubry.jpg": {
         "museum": false,
         "person": true,
-        "mq_h0": false,
-        "mq_h1": false
+        "mq_h0": true,
+        "mq_h1": true
       },
       "wearable_best_back.jpg": {
         "museum": false,
@@ -3384,8 +3975,8 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
       "wearable_biased-front.jpg": {
         "museum": false,
         "person": true,
-        "mq_h0": false,
-        "mq_h1": false
+        "mq_h0": true,
+        "mq_h1": true
       },
       "wearable_castle3-588.jpg": {
         "museum": true,
@@ -4632,52 +5223,33 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     var f = makeFace('station'); f.s = s; f.i = i;
     var L = labelOf(s.id);
     f.img.alt = (L.title ? L.title + ' by Marty Ornish' : 'Work by Marty Ornish') + (L.kind ? ' (' + L.kind.toLowerCase() + ')' : '');
-    // The wall label: its own element with the same rotation as the piece, so it turns with the wall and is never masked.
-    f.label = el('div', 'wall-label card'); f.label.setAttribute('aria-hidden', 'true');
-    f.label.appendChild(el('p', 'wl-title', L.title || ''));
-    f.label.appendChild(el('p', 'wl-detail', [L.year, L.materials, L.dimensions].filter(Boolean).join(', ') || L.kind || ''));
-    f.label.appendChild(el('p', 'wl-award', L.award || ''));
-    f.labelOn2 = el('p', 'wl-onview', ''); f.label.appendChild(f.labelOn2); setOnView(f.labelOn2, s.id);
-    // The actions are printed on the card so they turn with it; at rest the real buttons cover them exactly.
-    f.labelActs = el('p', 'wl-actions card-actions'); f.labelActs.appendChild(el('span', '', 'Look closely')); f.labelActs.appendChild(el('span', '', 'Copy link'));
-    f.label.appendChild(f.labelActs);
-    ring.appendChild(f.label);
+    // The wall label (round 9, addendum section 5): a small mounted paper card fixed on the wall beside the piece, at
+    // museum scale. It is part of the station's picture plane, so it turns, moves and is lit with the wall; it never
+    // fades or slides. Its text is read by moving the camera to it; screen readers get it as the station's description.
+    f.wl = el('div', 'wlabel'); f.wl.setAttribute('aria-hidden', 'true');
+    var paper = el('div', 'wl-paper');
+    paper.appendChild(el('p', 'wl-t', L.title || L.kind || ''));
+    paper.appendChild(el('p', 'wl-d', [L.year, L.materials, L.dimensions].filter(Boolean).join(', ') || L.kind || ''));
+    if (L.award) paper.appendChild(el('p', 'wl-a', L.award));
+    f.labelOn2 = el('p', 'wl-o', ''); paper.appendChild(f.labelOn2); setOnView(f.labelOn2, s.id);
+    var acts = el('p', 'wl-act'); f.wlLink = el('span', '', 'Copy link'); acts.appendChild(f.wlLink); paper.appendChild(acts);
+    f.wl.appendChild(paper); f.plane.appendChild(f.wl);
     return f;
   });
+  // Place the wall label in the plane, in the station picture's own coordinates (scene_r9.py: position, true scale and
+  // the light at that spot). Width is 10 cm on the wall; the card is laid out at 300 px and scaled down to it.
   function placeLabel(f) {
-    if (G.mode !== 'land' || !f.s.art) { f.labelOn = false; return; }
-    var c = camOf(G.mode), q = G.q, g = f.g;
-    var lw = f.label.offsetWidth || 230, lh = f.label.offsetHeight || 90;
-    var floor = f.s.floorY;
-    var xs = Math.min(f.s.art[3] * c.w + 0.03 * c.w, 0.97 * c.w - lw / q);
-    var left = (G.W - g.wp) / 2 + g.ext + xs * q;
-    var top = G.H / 2 + g.ty - g.hp / 2 + (floor - 0.1 * c.h) * q - lh;
-    // At rest the label stays on screen: clear of the header, and inside the right edge on narrow desktops.
-    left = Math.max(0, Math.min(left, G.W - lw - 12)); top = Math.max(top, 96);
-    f.label.style.left = left.toFixed(1) + 'px';
-    f.label.style.top = top.toFixed(1) + 'px';
-    f.label.style.transformOrigin = (G.W / 2 - left).toFixed(1) + 'px ' + (G.H / 2 - top).toFixed(1) + 'px';
-    f.labelOn = true;
+    var L9 = f.s.label9 && f.s.label9[G.mode], g = f.g; if (!L9 || !f.wl || !g) { if (f.wl) f.wl.style.display = 'none'; f.wlFrac = null; return; }
+    f.wl.style.display = '';
+    var pw = g.wp - 2 * g.ext, ph = g.hp, k = L9.w * pw / 300, dh = Math.max(f.wl.offsetHeight || 360, 360);
+    var x = g.ext + L9.x * pw, y = f.top + L9.cy * ph - dh * k / 2;
+    f.wl.style.transform = 'translate(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px) scale(' + k.toFixed(5) + ')';
+    f.wl.style.setProperty('--lb', L9.bright); f.wl.style.setProperty('--lt', 'rgb(' + L9.tint.map(function (c) { return Math.round(c * 255); }).join(',') + ')');
+    f.wlFrac = { x: L9.x, y: (y - f.top) / ph, w: L9.w, h: dh * k / ph };
   }
-  // Desktop: the Look closely and Copy link buttons sit exactly on the printed links of the label in front, while it
-  // rests square to the camera; while the room turns, the card's own printed links turn with it.
-  var toolsEl = $('workTools'), toolsCard = null;
-  function placeTools(on, near, dd) {
-    var f = faces[near], card = !labelPhone() && f && f.label && f.lvis && f.labelActs ? f : null;
-    var use = on && card && dd < 0.02;
-    toolsEl.classList.toggle('on-card', !!card);
-    if (toolsCard && toolsCard !== card) toolsCard.labelActs.style.visibility = '';
-    if (use) {
-      var a = f.labelActs.getBoundingClientRect(), w = workRoom.getBoundingClientRect();
-      toolsEl.style.left = (a.left - w.left).toFixed(1) + 'px'; toolsEl.style.top = (a.top - w.top).toFixed(1) + 'px'; toolsEl.style.bottom = 'auto';
-      f.labelActs.style.visibility = 'hidden'; toolsCard = f;
-    } else {
-      if (toolsCard) toolsCard.labelActs.style.visibility = '';
-      toolsCard = null;
-      if (card) toolsEl.style.visibility = 'hidden';               // between rests the printed links speak for the card
-      toolsEl.style.left = toolsEl.style.top = toolsEl.style.bottom = '';
-    }
-  }
+  // The gallery's own controls (Look closely, Copy link) stay in the lower left at both sizes; the label is on the wall.
+  var toolsEl = $('workTools');
+  function placeTools() { toolsEl.classList.remove('on-card'); }
   // The phone plate keeps one rectangle for every work: its height is the tallest label's.
   function plateText(id) { var L = labelOf(id); return { t: L.title || '', s: [L.year, L.kind].filter(Boolean).join(', ') || '' }; }
   function sizePlate() {
@@ -5026,8 +5598,8 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
               if (C.look) C.look = null;
               var atIt = !C.yawSeg && C.station === r.station && Math.abs(wrap180(ST[r.station].yawDeg - C.yaw)) < 0.5;
               if (!atIt || tw(C.indexA, tm) > 0.001) jumpToStation(r.station);
-              enterLook(r.station, { direct: !!e.direct, opener: document.activeElement });
-            }
+              enterLook(r.station, { direct: !!e.direct, opener: document.activeElement, level: r.level });
+            } else if (C.look.level !== r.level || e.focus) setLookLevel(r.level, e.focus);
           } else if (r.room === 'work' && r.station != null && !r.implicit) {
             // From the index (or a deep link) the camera simply stands there; in the walk it turns there.
             if (tw(C.indexA, tm) > 0.001 || e.jump) jumpToStation(r.station);
@@ -5072,7 +5644,7 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     }
     if ((parts[0] === 'station' || parts[0] === GH || parts[0] === 'work') && parts[1]) {
       var idx = -1; ST.forEach(function (s, i) { if (s.id === parts[1] || s.slug === parts[1]) idx = i; });
-      if (idx >= 0) return parts[2] === 'look' ? { hash: stationHash(idx) + '/look', room: 'work', index: null, station: idx, look: true }
+      if (idx >= 0) return ['look', 'detail', 'label'].indexOf(parts[2]) >= 0 ? { hash: stationHash(idx) + '/' + parts[2], room: 'work', index: null, station: idx, look: true, level: parts[2] }
         : { hash: stationHash(idx), room: 'work', index: null, station: idx };
     }
     var room = HASH_ROOM[parts[0]];
@@ -5104,7 +5676,7 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     var st = entryState();
     if (st && st.mi > 0 && st.prev != null) { var rp = parseRoute(st.prev); return { key: placeKey(rp), hash: rp.hash, r: rp, history: true }; }
     // Entered directly: the place above this one.
-    if (C.look) { var rl = parseRoute(stationHash(C.look.st)); return { key: placeKey(rl), hash: rl.hash, r: rl, above: true }; }
+    if (C.look) { var rl = parseRoute(C.look.level === 'look' ? stationHash(C.look.st) : lookHash(C.look.st, 'look')); return { key: placeKey(rl), hash: rl.hash, r: rl, above: true }; }
     var h = C.view === 'index' && C.idx.level === 3 ? SCENE.index.hash + '/' + SERIES[C.idx.series].slug
       : C.view === 'index' && C.idx.level === 2 ? SCENE.index.hash : 'work';
     var r = parseRoute(h);
@@ -5222,15 +5794,10 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
   // so the face beneath it in an overlap is always opaque there (no dark trough).
   function placeFace(f, ang, z, alpha, top) {
     var vis = alpha > 0.001 && Math.abs(ang) < f.g.half + G.viewHalf + 0.5;
-    if (vis !== f.vis) { f.el.style.visibility = vis ? 'inherit' : 'hidden'; f.el.style.willChange = vis ? 'transform' : ''; f.vis = vis; }
-    // Labels taper with angle: full near the centre, gone before a neighbour rests at the edge (V4-11).
-    var la = f.label ? alpha * (1 - smoothstep(18, 33, Math.abs(ang))) : 0;
-    // While any doorway is in the scene (turning to it, walking through, or leaving), wall labels stay down, so no
-    // label is ever drawn through a doorway (V5-06, interim until the doorways are permanent architecture).
-    // Walking up, the wall label fades out in the first 150 ms of the step, before the walk-up label appears (one label).
-    if (C.look) la *= C.look.phase === 'in' ? 1 - clamp((now() - C.look.t0) / 150, 0, 1) : 0;
-    var lv = !!(f.label && f.labelOn && vis && la > 0.01 && f.shown && !C.doors.length);
-    if (f.label && lv !== f.lvis) { f.label.style.visibility = lv ? 'inherit' : 'hidden'; f.lvis = lv; }
+    var wc = vis && !(C.look && f.i === C.look.st) ? 'transform' : '';         // walked up: drawn at the camera's real scale, so the label is sharp
+    if (vis !== f.vis) { f.el.style.visibility = vis ? 'inherit' : 'hidden'; f.vis = vis; }
+    if (f._wc !== wc) { f.el.style.willChange = wc; f._wc = wc; }
+
     if (!vis) return;
     var tf = reduced ? 'none' : 'translateZ(' + G.F.toFixed(3) + 'px) rotateY(' + (-ang).toFixed(4) + 'deg) translateZ(' + (-G.F).toFixed(3) + 'px)';
     // Stacking follows the same rule as the masks: top face highest, the rest by distance from the centre.
@@ -5241,7 +5808,6 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     f.el.style.zIndex = z;
     f.el.style.opacity = alpha < 1 ? alpha.toFixed(3) : '';
     f.el.style.transform = tf;
-    if (lv) { f.label.style.zIndex = 20000 - 2 * Math.round(Math.abs(ang) * 20); f.label.style.transform = tf; f.label.style.opacity = la < 0.999 ? la.toFixed(3) : ''; }
   }
   function render(tm) {
     var n = ST.length;
@@ -5412,8 +5978,8 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
   $('nextBtn').addEventListener('click', function () { dispatch({ type: 'step', dir: 1 }); });
   var suppressClick = false;
   // The side zones turn, except over the artwork itself: a click on the work walks up to it (see the walk-up).
-  $('zonePrev').addEventListener('click', function (e) { if (!suppressClick && artAt(e.clientX, e.clientY) < 0) dispatch({ type: 'step', dir: -1 }); });
-  $('zoneNext').addEventListener('click', function (e) { if (!suppressClick && artAt(e.clientX, e.clientY) < 0) dispatch({ type: 'step', dir: 1 }); });
+  $('zonePrev').addEventListener('click', function (e) { if (!suppressClick && artAt(e.clientX, e.clientY) < 0 && labelAt(e.clientX, e.clientY) < 0) dispatch({ type: 'step', dir: -1 }); });
+  $('zoneNext').addEventListener('click', function (e) { if (!suppressClick && artAt(e.clientX, e.clientY) < 0 && labelAt(e.clientX, e.clientY) < 0) dispatch({ type: 'step', dir: 1 }); });
   function canDrag() { return ST.length > 1 && C.intent.room === 'work' && !C.door && C.d === 0 && C.view === 'walk' && !C.pending && !C.look; }
   // Two-finger horizontal trackpad swipe (addendum 3): the camera follows the fingers like a drag; when the gesture ends
   // (180 ms without wheel events, momentum included) it settles on at most one piece away, so momentum never skips two.
@@ -5641,6 +6207,9 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     if (!opening && prev === 1 && ix.level === 2 && SERIES[ix.series]._cover) fromRect = SERIES[ix.series]._cover.getBoundingClientRect();
     if (!opening && prev === 2 && ix.level === 1 && tilesEls[0] && prevSeries >= 0) fromRect = tilesEls[0].img.getBoundingClientRect();
     finishIdxT();
+    // A series keeps its scroll position while one of its works is open (the series is hidden under the plate, which
+    // would otherwise clamp the scroller to the top) and gets it back on return.
+    if (prev === 2 && ix.level === 3) C.idx.seriesTop = { series: C.idx.series, top: indexEl.scrollTop };
     C.view = 'index';
     C.idx.level = ix.level;
     if (ix.level >= 2) { if ($('idxSeries')._series !== ix.series) buildSeries(ix.series); C.idx.series = ix.series; }
@@ -5648,6 +6217,7 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     $('idxSeries').hidden = ix.level !== 2;
     if (prev === 1 && ix.level === 2) indexEl.scrollTop = 0;
     layoutRows();
+    if (prev === 3 && ix.level === 2 && C.idx.seriesTop && C.idx.seriesTop.series === ix.series) { indexEl.scrollTop = C.idx.seriesTop.top; C.idx.seriesTop = null; }
     if (ix.level === 3) { if (C.idx.work !== ix.work) C.idx.view = 0; C.idx.work = ix.work; showPlate(); }
     if (false && fromRect) {
       var target = ix.level === 2 ? tilesEls[0].img : SERIES[prevSeries]._cover;
@@ -5976,6 +6546,7 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
   // =====================================================================================
   function setMenu(open, refocus, byPointer) {
     C.menuOpen = open;
+    if (WU) { WU.classList.toggle('under-menu', open); WU.inert = open; }      // the close-up's controls step aside under the Menu
     menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     menuBtn.textContent = open ? 'Close' : 'Menu';
     if (open) menu.hidden = false;
@@ -6179,18 +6750,25 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
   measure();
   ensureStation(0); ensureStation(1); ensureStation(ST.length - 1);
   // =====================================================================================
-  // Walk up to a piece (round 8, addendum 2 and 2b). One cancellable transaction per request: entry, Left/Right,
-  // view change, photo-set change and exit each take a new generation; a callback from an older generation never
-  // commits, moves the camera or restores focus. The camera frames the work, the decoded photograph takes over at the
-  // same place (registered pairs) or by an explicit cut (pairs that cannot be registered), and the label appears.
+  // Round 9: the in-room close-up (addendum sections 4, 5 and 7). Walking up is a camera move inside the station's own
+  // picture: the room stays visible, the registered art layer (img/art, the same cutout the plate was built from) is
+  // drawn exactly over the plate's art for the whole close-up, and the paper wall label beside the piece is part of the
+  // wall. Levels: gallery, walk-up (piece and label framed), close detail at a clicked point (up to the art layer's
+  // native pixels) and the label read close. A click on the art steps one level closer; Back, Esc, browser Back and a
+  // click outside step out one level. Every request takes a new generation; an older one never moves the camera.
+  // Routes: #station/<slug>/look, /detail, /label.
   // =====================================================================================
   var WU = $('walkup'), wuScrim = $('wuScrim'), wuStage = $('wuStage'), wuFrame = $('wuFrame'), wuLoupe = $('wuLoupe');
-  var wuLabel = $('wuLabel'), wuTools = $('wuTools'), wuBack = $('wuBack'), wuPrev = $('wuPrev'), wuNext = $('wuNext');
-  var artTarget = $('artTarget');
-  var WS = Slot('wuImg', 'wuPh', 'wuStatus', 'wu-img'); WS.custom = true;     // its Try again is wired per request below
-  var wuGen = 0;
-  var STEP = 0.5;                                         // seconds for the step toward the piece (minimum-jerk)
-  C.look = null;   // { gen, st, vi, phase: 'in' | 'wait' | 'shown' | 'out' | 'slide', t0, T, from, to, registered, rect, zoom }
+  var wuTools = $('wuTools'), wuBack = $('wuBack'), wuPrev = $('wuPrev'), wuNext = $('wuNext'), wuArt = $('wuArt'), wuWall = $('wuWall');
+  var artTarget = $('artTarget'), labelTarget = $('labelTarget'), wuLink = $('wuLink');
+  var WS = Slot('wuImg', 'wuPh', 'wuStatus', 'wu-img'); WS.custom = true;     // only for a chosen other photograph
+  // The label read close: the wall label's own card, drawn at screen resolution exactly over the one on the wall (same
+  // place, size, paper and light), so its text stays sharp at any distance. It appears at once (no fade) and follows
+  // the camera; the card on the wall is beneath it, identical.
+  var wuCard = el('div', 'wlabel wl-over'); wuCard.setAttribute('aria-hidden', 'true'); wuCard.hidden = true; wuStage.appendChild(wuCard);
+  var wuGen = 0, STEP = 0.55, FADE = 150;
+  var LEVELS = ['look', 'detail', 'label'];
+  C.look = null;   // { gen, st, level, phase: 'move' | 'slide' | 'out' | 'shown' | 'done', t0, T, from, to, cam, focus, alt, loupe, artA }
 
   function frameKey() { return G.mode === 'port' ? 'port' : 'land'; }
   // The station's picture area on screen with the face square to the camera and the scene untransformed.
@@ -6198,286 +6776,310 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     var f = faces[i], g = f && f.g; if (!g) return null;
     return { x: (G.W - g.wp) / 2 + g.ext, y: G.H / 2 + g.ty - g.hp / 2, w: g.wp - 2 * g.ext, h: g.hp };
   }
+  function fracRect(R, fr) { return { x: R.x + fr[0] * R.w, y: R.y + fr[1] * R.h, w: fr[2] * R.w, h: fr[3] * R.h }; }
   function artRect(i) {
     var R = faceImgRect(i), s = ST[i], b = G.mode === 'port' ? s.artPortrait : s.art; if (!R || !b) return R;
     return { x: R.x + b[2] * R.w, y: R.y + b[0] * R.h, w: (b[3] - b[2]) * R.w, h: (b[1] - b[0]) * R.h };
   }
-  // The view a station opens with, the file it shows, and whether that pair is registered with the composite.
-  function lookPlan(i, vi) {
-    var s = ST[i], views = s.look.views, ok = viewIdxList(views);
-    var r0 = resolve(views[ok[0]][0]), setKey = r0 && r0.kind === 'museum' ? 'museum' : 'original';
-    var reg = s.reg && s.reg[frameKey()] && s.reg[frameKey()][setKey];
-    if (vi == null) vi = reg && reg.registered && ok.indexOf(reg.view) >= 0 ? reg.view : ok[0];
-    var file = views[vi][0], r = resolve(file), key = r && r.kind === 'museum' ? 'museum' : 'original';
-    var rg = s.reg && s.reg[frameKey()] && s.reg[frameKey()][key];
-    var registered = !!(rg && rg.registered && rg.view === vi);
-    return { vi: vi, file: file, v: views[vi], src: workSrc(file), registered: registered, reg: registered ? rg.rect : null, adj: registered ? rg.adj || null : null };
-  }
-  function viewIdxList(views) { var ok = []; views.forEach(function (v, i) { if (!omitted(v[0])) ok.push(i); }); return ok.length ? ok : views.map(function (_, i) { return i; }); }
-  // Where the photograph sits when walked up: desktop, the area left of the label; phone, above the collapsed sheet.
-  function lookArea() {
-    var W = G.W, H = G.H, phone = labelPhone();
-    if (phone) return { x: 14, y: 108, w: W - 28, h: Math.max(120, H - 108 - 196) };      // below the Back control, above the sheet and tools
-    var lw = labelW();
-    return { x: 72, y: 96, w: Math.max(200, W - lw - 72 - 72 - LGAP), h: Math.max(160, H - 96 - 56) };
-  }
-  // Desktop: the label stands beside the photograph, the pair centred between the arrows, the label centred on the work.
-  var LGAP = 48;
-  function labelW() { return Math.round(Math.min(380, Math.max(300, G.W * 0.27))); }
-  function pairShift(T) {
-    if (labelPhone()) return 0;
-    var span = T.w + LGAP + labelW(), x0 = Math.max(72, (G.W - span) / 2);
-    return Math.min(x0, G.W - 72 - span) - T.x;
-  }
-  function shiftBy(o, dx) { if (!dx) return o; o.photo.x += dx; o.cam.tx += dx; return o; }
-  function placeWuLabel() {
-    var L = C.look; wuLabel.style.left = wuLabel.style.top = wuLabel.style.width = '';
-    if (!L || labelPhone() || !L.photo) return;
-    var P = L.photo, lw = labelW(), top0 = 96, bot = G.H - 56;
-    wuLabel.style.width = lw + 'px';
-    var lh = wuLabel.offsetHeight;
-    wuLabel.style.left = Math.round(Math.min(P.x + P.w + LGAP, G.W - 72 - lw)) + 'px';
-    wuLabel.style.top = Math.round(clamp(P.y + P.h / 2 - lh / 2, top0, Math.max(top0, bot - lh))) + 'px';
-  }
-  function fitRect(w, h, A, nat) {
-    var s = Math.min(A.w / w, A.h / h); if (nat) s = Math.min(s, nat / w);       // never larger than its own pixels
-    return { x: A.x + (A.w - w * s) / 2, y: A.y + (A.h - h * s) / 2, w: w * s, h: h * s };
-  }
-  // The camera (a 2D transform of the scene, origin 0 0) that carries rect R onto rect T.
-  function camFor(R, T) { var s = T.w / R.w; return { s: s, tx: T.x - s * R.x, ty: T.y - s * R.y }; }
+  function layerOf(i) { var a = ST[i].art9; return a ? a[frameKey()] : null; }
+  function layerRect(i) { var a = layerOf(i), R = faceImgRect(i); return a && R ? fracRect(R, a.rect) : null; }
+  function labelRect(i) { var f = faces[i], R = faceImgRect(i); return f && f.wlFrac && R ? fracRect(R, [f.wlFrac.x, f.wlFrac.y, f.wlFrac.w, f.wlFrac.h]) : null; }
+  function union(a, b) { if (!a) return b; if (!b) return a; var x = Math.min(a.x, b.x), y = Math.min(a.y, b.y); return { x: x, y: y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y }; }
+  function camApply(c, r) { return { x: c.tx + c.s * r.x, y: c.ty + c.s * r.y, w: r.w * c.s, h: r.h * c.s }; }
   function camLerp(a, b, p) { return { s: a.s * Math.pow(b.s / a.s, p), tx: a.tx + (b.tx - a.tx) * p, ty: a.ty + (b.ty - a.ty) * p }; }
   var CAM0 = { s: 1, tx: 0, ty: 0 };
-  // The frame the walk-up shows: registered pairs frame the photograph's registered rectangle (so it takes over in
-  // place); otherwise the art box is framed and the photograph is fitted to the area after a cut.
-  function lookTarget(i, plan) {
-    var A = lookArea(), R0 = faceImgRect(i);
-    if (plan.registered && R0) {
-      var g = plan.reg, R = { x: R0.x + g[0] * R0.w, y: R0.y + g[1] * R0.h, w: g[2] * R0.w, h: g[3] * R0.h };
-      var T = fitRect(R.w, R.h, A, plan.v[2]), cam = camFor(R, T);
-      if (plan.adj) { T.x += plan.adj[0] * T.w; T.y += plan.adj[1] * T.h; }    // rendered-frame refinement (refine_handoff.py)
-      return shiftBy({ cam: cam, photo: T }, pairShift(T));
-    }
-    var a = artRect(i), Ta = fitRect(a.w, a.h, A), P = fitRect(plan.v[2], plan.v[3], A, plan.v[2]);
-    return shiftBy({ cam: camFor(a, Ta), photo: P }, pairShift(P));
+  // The free area the close-up frames into: below the Back control, above the tools, between the arrows.
+  function area() {
+    var W = G.W, H = G.H;
+    return labelPhone() ? { x: 50, y: 104, w: W - 100, h: H - 104 - 112 } : { x: 84, y: 100, w: W - 168, h: H - 100 - 84 };   // clear of the arrows
   }
-
+  function camFit(U, A) { var s = Math.min(A.w / U.w, A.h / U.h); return { s: s, tx: A.x + (A.w - U.w * s) / 2 - s * U.x, ty: A.y + (A.h - U.h * s) / 2 - s * U.y }; }
+  // Keep the view inside the station's picture (the plate), so a close-up never shows past the photographed room.
+  function clampCam(c, i) {
+    var R = faceImgRect(i), W = G.W, H = G.H; if (!R) return c;
+    var need = Math.max(W / R.w, H / R.h);                        // the picture always covers the screen (no edge or mirrored floor)
+    if (c.s < need) { var cx = (W / 2 - c.tx) / c.s, cy = (H / 2 - c.ty) / c.s; c = { s: need, tx: W / 2 - need * cx, ty: H / 2 - need * cy }; }
+    var lo = W - c.s * (R.x + R.w), hi = -c.s * R.x; c.tx = lo <= hi ? clamp(c.tx, lo, hi) : (lo + hi) / 2;
+    var lo2 = H - c.s * (R.y + R.h), hi2 = -c.s * R.y; c.ty = lo2 <= hi2 ? clamp(c.ty, lo2, hi2) : (lo2 + hi2) / 2;
+    return c;
+  }
+  function lookCam(i) {
+    var a = artRect(i), l = labelRect(i), U = union(a, l); if (!U) return CAM0;
+    var pad = 0.04 * Math.max(U.w, U.h); U = { x: U.x - pad, y: U.y - pad, w: U.w + 2 * pad, h: U.h + 2 * pad };
+    return clampCam(camFit(U, area()), i);
+  }
+  // Native: one art-layer pixel per CSS pixel (never enlarged further at the close-detail level).
+  function nativeScale(i) { var a = layerOf(i), r = layerRect(i); return a && r ? a.w / r.w : 2; }
+  function detailScale(i) { return Math.max(nativeScale(i), lookCam(i).s * 1.5); }
+  function detailCam(i, focus) {
+    var R = faceImgRect(i), s = detailScale(i), A = area();
+    var P = focus ? { x: R.x + focus.u * R.w, y: R.y + focus.v * R.h } : (function (a) { return { x: a.x + a.w / 2, y: a.y + a.h / 2 }; })(artRect(i));
+    return clampCam({ s: s, tx: A.x + A.w / 2 - s * P.x, ty: A.y + A.h / 2 - s * P.y }, i);
+  }
+  // Reading distance: the card shown about 400 px wide on a desktop, the full width (less the margins) on a phone.
+  function labelCam(i) {
+    var l = labelRect(i); if (!l) return lookCam(i);
+    var A = area(), want = labelPhone() ? G.W - 32 : Math.min(420, A.w * 0.45), s = want / l.w;
+    s = Math.min(s, (A.h - 24) / l.h);
+    return clampCam({ s: s, tx: G.W / 2 - s * (l.x + l.w / 2), ty: A.y + A.h / 2 - s * (l.y + l.h / 2) }, i);
+  }
+  function camFor(i, level, focus) { return level === 'detail' ? detailCam(i, focus) : level === 'label' ? labelCam(i) : lookCam(i); }
+  function lookHash(i, level) { return stationHash(i) + '/' + (level || 'look'); }
   function lookActive() { return !!C.look; }
+  function stationView(i) { var v = ST[i].view; return v == null ? 0 : v; }
+
   function enterLook(i, opts) {
     opts = opts || {};
-    var gen = ++wuGen, plan = lookPlan(i, opts.vi), tg = lookTarget(i, plan), tm = now(); WS.t0 = tm; WS._gen = gen;
+    var gen = ++wuGen, level = opts.level || 'look', tm = now(), to = camFor(i, level);
     var from = C.look ? C.look.cam || CAM0 : CAM0;
-    C.look = { gen: gen, st: i, vi: plan.vi, plan: plan, phase: opts.direct || reduced ? 'wait' : 'in', t0: tm, T: STEP, from: from, to: tg.cam, cam: from,
-      photo: tg.photo, zoom: { z: 1, x: 0, y: 0 }, loupe: null, opener: opts.opener || document.activeElement };
-    if (opts.direct || reduced) C.look.cam = tg.cam;
-    wuOpen(); wuHideContent();
-    requestLookPhoto(gen);
+    C.look = { gen: gen, st: i, level: level, phase: opts.direct || reduced ? 'shown' : 'move', t0: tm, T: STEP, from: from, to: to, cam: opts.direct || reduced ? to : from,
+      focus: null, alt: null, loupe: null, loupeOn: false, artA: { t0: tm, from: 0, to: 1 }, opener: opts.opener || document.activeElement, freeZoom: false };
+    var a = layerOf(i); if (a) asset(a.src, 'high');
+    wuOpen(); showControls(false);
+    if (C.look.phase === 'shown') arrive();
     kick();
   }
-  // Ask for the photograph of the current plan; commit only if this generation is still current when it decodes.
-  function requestLookPhoto(gen) {
-    var L = C.look; if (!L || L.gen !== gen) return;
-    var a = asset(L.plan.src, 'high');
-    a.p.then(function () { if (C.look && C.look.gen === gen) { kick(); } });
+  // Another level of the same piece: the camera moves from where it is now; the newest request wins.
+  function setLookLevel(level, focus) {
+    var L = C.look; if (!L || LEVELS.indexOf(level) < 0) return;
+    var gen = ++wuGen; L.gen = gen; L.level = level; if (focus !== undefined) L.focus = focus;
+    if (level !== 'detail') L.focus = null;
+    setLoupe(null); closeAlt();
+    L.from = L.cam || CAM0; L.to = camFor(L.st, level, L.focus); L.t0 = now(); L.T = STEP; L.freeZoom = false;
+    L.phase = reduced ? 'shown' : 'move'; if (reduced) { L.cam = L.to; arrive(); } else showControls(true, true);
+    kick();
   }
   function exitLook(opts) {
     var L = C.look; if (!L) return;
     opts = opts || {};
     var gen = ++wuGen;
     L.gen = gen; L.phase = reduced || opts.cut ? 'done' : 'out'; L.t0 = now(); L.T = STEP; L.from = L.cam; L.to = CAM0;
-    wuHideContent(); setLoupe(null);
+    showControls(false); setLoupe(null); closeAlt();
     kick();
   }
   function slideLook(dir) {
     var L = C.look; if (!L || L.phase === 'out' || L.phase === 'done') return;
-    var j = mod(L.st + dir, ST.length), gen = ++wuGen, plan = lookPlan(j), tm = now(); WS.t0 = tm; WS._gen = gen;
-    var tg = lookTarget(j, plan);
-    wuHideContent(); setLoupe(null);
-    var cur = L.cam || CAM0;
-    C.look = { gen: gen, st: j, vi: plan.vi, plan: plan, phase: reduced ? 'wait' : 'slide', t0: tm, T: TIMING.turnPerStep * 0.85, from: cur, to: tg.cam, cam: reduced ? tg.cam : cur,
-      photo: tg.photo, zoom: { z: 1, x: 0, y: 0 }, loupe: null, opener: L.opener, yaw0: C.yaw, yaw1: yawFor(j, C.yaw + (dir > 0 ? 1 : -1) * CAM.stepHint * 0.5) };
-    if (reduced) { C.yaw = C.look.yaw1; C.station = j; C.intent.station = j; }
+    var j = mod(L.st + dir, ST.length), gen = ++wuGen, tm = now();
+    showControls(false); setLoupe(null); closeAlt();
+    var cur = L.cam || CAM0, yaw1 = yawFor(j, C.yaw + (dir > 0 ? 1 : -1) * CAM.stepHint * 0.5);
+    // The art layer fades out over 150 ms with the camera still, then the camera slides (an overlay cannot turn with the wall).
+    C.look = { gen: gen, st: j, fadeSt: L.st, level: 'look', phase: reduced ? 'shown' : 'slide', t0: tm + (reduced ? 0 : FADE), T: TIMING.turnPerStep * 0.85, from: cur, to: lookCam(j), cam: reduced ? lookCam(j) : cur,
+      focus: null, alt: null, loupe: null, loupeOn: false, artA: { t0: tm, from: wuArtOpacity(tm), to: 0 }, opener: L.opener, yaw0: C.yaw, yaw1: yaw1, freeZoom: false };
+    var a = layerOf(j); if (a) asset(a.src, 'high');
+    if (reduced) { C.yaw = yaw1; C.station = j; C.intent.station = j; arrive(); }
     pushHash(lookHash(j), true);
     announce(j);
-    requestLookPhoto(gen);
     kick();
   }
-  function lookHash(i) { return stationHash(i) + '/look'; }
-  // Called every frame from render(): camera progress, phase changes and the commit of a decoded photograph.
+  // Called every frame from render(): camera progress and the art layer, which follows the camera exactly.
   function lookFrame(tm) {
     var L = C.look; if (!L) return '';
-    if (L.phase === 'in' || L.phase === 'out' || L.phase === 'slide') {
+    if (L.phase === 'move' || L.phase === 'out' || L.phase === 'slide') {
       var p = clamp((tm - L.t0) / (L.T * 1000), 0, 1), e = mj(p);
+      if (tm < L.t0) kick();
       L.cam = camLerp(L.from, L.to, e);
       if (L.phase === 'slide') { C.yaw = L.yaw0 + (L.yaw1 - L.yaw0) * e; if (p >= 1) { C.station = L.st; C.intent.station = L.st; C.intent.yaw = null; } }
-      if (p >= 1) L.phase = L.phase === 'out' ? 'done' : 'wait';
-    }
-    if (L.phase === 'wait') {
-      var a = ASSETS[L.plan.src];
-      if (a && a.state === 'ready') commitLook();
-      else wuStatus(tm);
-    } else if (L.phase === 'in' || L.phase === 'slide') {
-      var a2 = ASSETS[L.plan.src]; if (!(a2 && a2.state === 'ready')) wuStatus(tm);   // Loading after 150 ms, also during the step
+      if (L.phase === 'out' && p > 1 - FADE / (L.T * 1000) && L.artA.to !== 0) L.artA = { t0: tm, from: wuArtOpacity(tm), to: 0 };
+      if (p >= 1) { if (L.phase === 'out') L.phase = 'done'; else { var wasSlide = L.phase === 'slide'; L.phase = 'shown'; if (wasSlide) L.artA = { t0: tm, from: 0, to: 1 }; arrive(); } }
     }
     if (L.phase === 'done') { closeLookNow(); return ''; }
+    drawArt(tm); drawCard();
+    wuScrim.style.opacity = clamp((L.cam.s - 1) / 0.5, 0, 1).toFixed(3);       // the edges dim as the camera closes in
     var c = L.cam;
     return c.s === 1 && !c.tx && !c.ty ? '' : 'translate(' + c.tx.toFixed(2) + 'px,' + c.ty.toFixed(2) + 'px) scale(' + c.s.toFixed(5) + ')';
   }
-  function wuStatus(tm) {
-    var L = C.look, a = ASSETS[L.plan.src], failed = a && a.state === 'failed';
-    WS.want = L.plan.src; WS.failed = failed; WS.shown = null; if (WS._gen !== L.gen) { WS.t0 = tm; WS._gen = L.gen; }
-    slotStatus(WS, tm);
-    WS.retry.onclick = function () { retry(L.plan.src); WS.failed = false; WS.t0 = now(); requestLookPhoto(L.gen); kick(); };
-    if (failed || tm - WS.t0 > 150) { WU.hidden = false; }
+  // The art layer: drawn over the plate's art at the camera's own geometry. It fades in over 150 ms when the step
+  // starts (or when it arrives later) and out over 150 ms before a slide or at the end of stepping back.
+  function wuArtOpacity(tm) { var L = C.look; if (!L) return 0; var A = L.artA, p = clamp((tm - A.t0) / FADE, 0, 1); return A.from + (A.to - A.from) * p; }
+  function drawArt(tm) {
+    var L = C.look, sl = L.phase === 'slide', st = sl && L.fadeSt != null ? L.fadeSt : L.st, a = layerOf(st), r = layerRect(st);
+    if (sl && tm >= L.t0) a = null;                               // the slide itself runs without the overlay
+    if (!a || !r || !isReady(a.src) || sl && wuArtOpacity(tm) <= 0) { wuArt.hidden = true; if (a && !isReady(a.src) && L.artA.to === 1) L.artA.t0 = tm; return; }
+    var q = camApply(L.cam, r);
+    if (wuArt.getAttribute('src') !== a.src) wuArt.src = a.src;
+    wuArt.hidden = false;
+    wuArt.style.left = q.x.toFixed(2) + 'px'; wuArt.style.top = q.y.toFixed(2) + 'px'; wuArt.style.width = q.w.toFixed(2) + 'px'; wuArt.style.height = q.h.toFixed(2) + 'px';
+    var o = wuArtOpacity(tm); wuArt.style.opacity = o >= 0.999 ? '' : o.toFixed(3);
+    if (tm - L.artA.t0 < FADE + 20) kick();
   }
-  // Commit: photograph, label and controls appear together, at the camera's end point.
-  function commitLook() {
-    var L = C.look, a = ASSETS[L.plan.src];
-    L.phase = 'shown';
-    WS.status.hidden = true;
-    var node = a.img.parentNode && a.img.parentNode !== wuFrame ? a.img.cloneNode() : a.img, old = $('wuImg');
-    if (node !== old) { node.id = 'wuImg'; node.className = 'wu-img ready'; node.draggable = false; old.parentNode.replaceChild(node, old); }
-    node.alt = lookAlt(L);
-    L.natural = { w: a.img.naturalWidth || L.plan.v[2], h: a.img.naturalHeight || L.plan.v[3] };
-    placeLookPhoto();
-    wuFrame.hidden = false;
-    WU.classList.toggle('registered', L.plan.registered);
-    WU.classList.add('shown');
-    lookLabel(L);
-    wuLabel.hidden = false; placeWuLabel(); wuTools.hidden = false; wuBack.hidden = false; wuPrev.hidden = wuNext.hidden = ST.length < 2;
-    WU.setAttribute('aria-label', labelOf(ST[L.st].id).title || 'Artwork');
-    try { $('wuTitle').focus({ preventScroll: true }); } catch (err) { $('wuTitle').focus(); }
-    live.textContent = (labelOf(ST[L.st].id).title || 'Artwork') + ', walked up';
+  function drawCard() {
+    var L = C.look, f = faces[L.st], l = labelRect(L.st);
+    if (!f || !f.wl || !l || L.phase === 'slide') { wuCard.hidden = true; showWallCard(); return; }
+    if (wuCard._st !== L.st || wuCard._mode !== G.mode) {
+      wuCard.innerHTML = f.wl.innerHTML; wuCard._st = L.st; wuCard._mode = G.mode;
+      wuCard.style.setProperty('--lb', f.wl.style.getPropertyValue('--lb')); wuCard.style.setProperty('--lt', f.wl.style.getPropertyValue('--lt'));
+    }
+    var q = camApply(L.cam, l), k = q.w / 300;
+    wuCard.hidden = false; hideWallCard(f);
+    wuCard.style.transform = 'translate(' + q.x.toFixed(2) + 'px,' + q.y.toFixed(2) + 'px) scale(' + k.toFixed(5) + ')';
   }
-  function lookAlt(L) { var Lb = labelOf(ST[L.st].id); return (Lb.title || Lb.kind || 'Artwork') + ' by Marty Ornish' + (L.plan.v && ST[L.st].look.views.length > 1 ? ', ' + viewNames(ST[L.st].look)[L.vi] : ''); }
-  // The photograph's frame on screen, with zoom and pan applied (pan is clamped so the photograph covers its frame).
-  function placeLookPhoto() {
-    var L = C.look; if (!L || L.phase !== 'shown') return;
-    var P = L.photo, z = L.zoom, maxZ = maxZoom(L);
-    z.z = clamp(z.z, 1, maxZ);
-    var w = P.w * z.z, h = P.h * z.z, lim = function (v, span) { return clamp(v, Math.min(0, -(span) / 2), Math.max(0, span / 2)); };
-    z.x = lim(z.x, w - P.w); z.y = lim(z.y, h - P.h);
-    wuFrame.style.left = P.x.toFixed(2) + 'px'; wuFrame.style.top = P.y.toFixed(2) + 'px';
-    wuFrame.style.width = P.w.toFixed(2) + 'px'; wuFrame.style.height = P.h.toFixed(2) + 'px';
-    var img = $('wuImg');
-    img.style.transform = 'translate(' + z.x.toFixed(2) + 'px,' + z.y.toFixed(2) + 'px) scale(' + z.z.toFixed(4) + ')';
-    $('wuZoomIn').disabled = z.z >= maxZ - 1e-3; $('wuZoomOut').disabled = $('wuFit').disabled = z.z <= 1 + 1e-3;
-    var head = loupeHeadroom(L); $('wuLoupeBtn').disabled = head < 1.1;
-    $('wuLoupeBtn').title = head < 1.1 ? 'The full detail is already shown' : '';
-    WU.classList.toggle('zoomed', z.z > 1 + 1e-3);
-  }
-  // Native resolution: the decoded pixels shown one to one on the device (never upscaled beyond them).
-  function maxZoom(L) { var dpr = window.devicePixelRatio || 1; return Math.max(1, (L.natural ? L.natural.w : L.plan.v[2]) / (L.photo.w * dpr)); }
-  function zoomAt(f, cx, cy) {
-    var L = C.look; if (!L || L.phase !== 'shown') return;
-    var z = L.zoom, P = L.photo, nz = clamp(z.z * f, 1, maxZoom(L)), k = nz / z.z;
-    if (cx == null) { cx = P.x + P.w / 2; cy = P.y + P.h / 2; }
-    var ox = cx - (P.x + P.w / 2), oy = cy - (P.y + P.h / 2);          // keep the point under the pointer still
-    z.x = ox - (ox - z.x) * k; z.y = oy - (oy - z.y) * k; z.z = nz;
-    placeLookPhoto(); if (L.loupe) setLoupe(L.loupe);
-  }
-  function lookLabel(L) {
-    var s = ST[L.st], Lb = labelOf(s.id), names = viewNames(s.look);
+  // While the sharp card is up, the identical card on the wall under it is not drawn (its soft edge would show).
+  var hiddenWl = null;
+  function hideWallCard(f) { if (hiddenWl === f) return; showWallCard(); hiddenWl = f; f.wl.style.visibility = 'hidden'; }
+  function showWallCard() { if (hiddenWl) hiddenWl.wl.style.visibility = ''; hiddenWl = null; }
+  function arrive() {
+    var L = C.look; if (!L) return;
+    showControls(true);
+    var Lb = labelOf(ST[L.st].id);
+    WU.setAttribute('aria-label', (Lb.title || 'Artwork') + (L.level === 'label' ? ', label' : L.level === 'detail' ? ', close detail' : ''));
     $('wuTitle').textContent = Lb.title || Lb.kind || 'Artwork';
-    $('wuDetail').textContent = [Lb.year, Lb.materials, Lb.dimensions].filter(Boolean).join(', ') || Lb.kind || '';
-    $('wuAward').textContent = Lb.award || ''; $('wuAward').hidden = !Lb.award;
-    setOnView($('wuOnView'), s.id);
-    setNote($('wuNote'), photoNote(L.plan.file));
-    var vv = $('wuViews'), ok = viewIdxList(s.look.views); vv.textContent = '';
-    if (ok.length > 1) ok.forEach(function (i) {
-      var b = el('button', 'wu-view', names[i]); b.type = 'button'; b.setAttribute('aria-pressed', i === L.vi ? 'true' : 'false');
-      b.addEventListener('click', function () { lookView(i); });
+    if (!L.focused) { L.focused = true; try { $('wuTitle').focus({ preventScroll: true }); } catch (err) { $('wuTitle').focus(); } }
+    live.textContent = (Lb.title || 'Artwork') + (L.level === 'label' ? ', reading the label' : L.level === 'detail' ? ', close detail' : ', walked up');
+  }
+  function showControls(on, keepNav) {
+    var L = C.look;
+    wuTools.hidden = !on; wuBack.hidden = !on && !keepNav; wuPrev.hidden = wuNext.hidden = !on || ST.length < 2 || (L && L.level !== 'look');
+    if (!L) return;
+    wuBack.textContent = L.level === 'look' ? 'Back to gallery' : 'Back to the whole piece';
+    renderViews(); placeCardLink(); updateZoomTools();
+  }
+  // The other photographs of the work (back, details): only when the visitor chooses one; the station's own image is
+  // the close-up itself. A chosen photograph is shown on the museum wall, never on black.
+  function renderViews() {
+    var L = C.look, vv = $('wuViews'); vv.textContent = ''; if (!L || L.level === 'label') { vv.hidden = true; return; }
+    var s = ST[L.st], views = s.look.views, names = viewNames(s.look), own = s.view, list = [];
+    list.push({ vi: own != null && own >= 0 ? own : -1, name: own != null && own >= 0 ? names[own] : 'In the gallery', own: true });
+    views.forEach(function (v, k) { if (k !== own && !omitted(v[0])) list.push({ vi: k, name: names[k] }); });
+    if (list.length < 2) { vv.hidden = true; return; }
+    list.forEach(function (it) {
+      var b = el('button', 'wu-tool', it.name); b.type = 'button';
+      b.setAttribute('aria-pressed', (it.own ? L.alt == null : L.alt === it.vi) ? 'true' : 'false');
+      b.addEventListener('click', function () { if (it.own) closeAlt(); else openAlt(it.vi); renderViews(); });
       vv.appendChild(b);
     });
-    vv.hidden = ok.length < 2;
+    vv.hidden = false;
   }
-  // A different view of the same work: the photograph changes in place (no camera move); only the registered view
-  // keeps the registered frame, the others are fitted to the area.
-  function lookView(vi, force) {
-    var L = C.look; if (!L || (!force && (L.phase !== 'shown' || vi === L.vi))) return;
-    var gen = ++wuGen, plan = lookPlan(L.st, vi), tg = lookTarget(L.st, plan); WS.t0 = now(); WS._gen = gen;
-    L.gen = gen; L.vi = vi; L.plan = plan; L.photo = tg.photo;
-    L.zoom = { z: 1, x: 0, y: 0 }; setLoupe(null);
-    L.phase = 'wait'; wuFrame.hidden = false;
-    requestLookPhoto(gen); kick();
+  function openAlt(vi) {
+    var L = C.look; if (!L) return;
+    var file = ST[L.st].look.views[vi][0], src = workSrc(file), gen = L.gen, v = ST[L.st].look.views[vi];
+    L.alt = vi; setLoupe(null);
+    wuWall.hidden = false; WS.t0 = now(); WS._gen = gen;
+    var a = asset(src, 'high');
+    a.p.then(function () {
+      if (!C.look || C.look.alt !== vi || C.look.gen !== gen) return;
+      if (a.state !== 'ready') { WS.want = src; WS.failed = true; slotStatus(WS, now()); WS.retry.onclick = function () { retry(src); openAlt(vi); }; return; }
+      var node = a.img.cloneNode(), old = $('wuImg'); node.id = 'wuImg'; node.className = 'wu-img ready'; node.draggable = false; old.parentNode.replaceChild(node, old);
+      var Lb = labelOf(ST[C.look.st].id); node.alt = (Lb.title || 'Artwork') + ' by Marty Ornish, ' + viewNames(ST[C.look.st].look)[vi];
+      var A = area(), sc = Math.min(A.w / v[2], A.h / v[3], 1);
+      wuFrame.style.left = (A.x + (A.w - v[2] * sc) / 2).toFixed(1) + 'px'; wuFrame.style.top = (A.y + (A.h - v[3] * sc) / 2).toFixed(1) + 'px';
+      wuFrame.style.width = (v[2] * sc).toFixed(1) + 'px'; wuFrame.style.height = (v[3] * sc).toFixed(1) + 'px';
+      wuFrame.hidden = false; WS.status.hidden = true;
+    });
+    setTimeout(function () { if (C.look && C.look.alt === vi && wuFrame.hidden && a.state !== 'ready' && a.state !== 'failed') { WS.want = src; WS.failed = false; slotStatus(WS, now() + 1000); } }, 150);
+  }
+  function closeAlt() { var L = C.look; if (L) L.alt = null; wuFrame.hidden = true; wuWall.hidden = true; WS.status.hidden = true; }
+  // Copy link sits on the card when it is read close: a real button exactly over the card's printed words.
+  function placeCardLink() {
+    var L = C.look, sp = L && wuCard.querySelector('.wl-act span');
+    if (!L || L.level !== 'label' || L.phase !== 'shown' || !sp) { wuLink.hidden = true; return; }
+    var r = sp.getBoundingClientRect(); if (!r.width) { wuLink.hidden = true; return; }
+    wuLink.hidden = false;
+    wuLink.style.left = (r.left - 4).toFixed(1) + 'px'; wuLink.style.top = (r.top - 6).toFixed(1) + 'px';
+    wuLink.style.width = (r.width + 8).toFixed(1) + 'px'; wuLink.style.height = (r.height + 12).toFixed(1) + 'px';
+  }
+  function updateZoomTools() {
+    var L = C.look; if (!L) return;
+    $('wuZoomIn').disabled = L.level !== 'look';
+    $('wuZoomOut').disabled = L.level === 'look' && !L.freeZoom;
+    var head = loupeHeadroom(); $('wuLoupeBtn').disabled = L.level === 'label' || head < 1.1;
+    $('wuLoupeBtn').title = head < 1.1 ? 'The full detail is already shown' : '';
+    $('wuLoupeBtn').setAttribute('aria-pressed', L.loupeOn ? 'true' : 'false');
   }
   function wuOpen() {
-    WU.hidden = false; WU.classList.remove('shown', 'zoomed');
-    viewerBackground().forEach(function (n) { n.inert = true; });
+    WU.hidden = false; wuScrim.style.opacity = '0';
+    $('world').inert = true; document.documentElement.classList.add('walked-up');
     updateNav();
-  }
-  function wuHideContent() {
-    if (WU.contains(document.activeElement) && document.activeElement !== WU) { try { WU.focus({ preventScroll: true }); } catch (err) { /* best effort */ } }
-    WU.classList.remove('shown'); wuFrame.hidden = true; wuLabel.hidden = true; wuTools.hidden = true; wuBack.hidden = true; wuPrev.hidden = wuNext.hidden = true;
-    WS.status.hidden = true; $('wuExpand').setAttribute('aria-expanded', 'false'); wuLabel.classList.remove('expanded');
   }
   function closeLookNow() {
     var L = C.look; C.look = null;
-    WU.hidden = true; wuHideContent(); setLoupe(null);
-    viewerBackground().forEach(function (n) { n.inert = false; });
+    WU.hidden = true; showControls(false); setLoupe(null); closeAlt(); wuArt.hidden = true; wuLink.hidden = true; wuCard.hidden = true; wuCard._st = -1; showWallCard();
+    $('world').inert = false; document.documentElement.classList.remove('walked-up');
     updateNav();
     var back = L && L.opener && L.opener.isConnected && L.opener !== document.body ? L.opener : $('lookBtn');
     if (L && L.gen === wuGen) { try { back.focus({ preventScroll: true }); } catch (err) { /* best effort */ } }
     kick(); setTimeout(kick, 0);                                  // one more frame after this one, so the gallery's chrome returns
   }
+  // Busy while the camera moves or the art layer is still fading (so the frame loop keeps drawing until it is done).
   function lookBusy() {
-    var L = C.look; if (!L || L.phase === 'shown') return false;
-    if (L.phase === 'wait') { var a = ASSETS[L.plan.src]; if (a && a.state === 'failed') return false; }   // a failure is a resting state (Try again)
-    return true;
+    var L = C.look; if (!L) return false; if (L.phase !== 'shown') return true;
+    var a = layerOf(L.st); if (!a || isFailed(a.src)) return false;           // a missing layer rests on the plate
+    return !isReady(a.src) || now() - L.artA.t0 < FADE + 34;
   }
+  // Kept for the photo-set toggle: a chosen other photograph is requested again in the new set.
+  function lookView() { var L = C.look; if (L && L.alt != null) openAlt(L.alt); }
 
-  // ---- Loupe: a round glass over the photograph showing its decoded pixels, never past native resolution. ----
+  // ---- Loupe: a small magnifier control. With it on, a round glass follows the pointer over the art layer (touch:
+  // press and hold), showing the layer's own pixels up to one per device pixel. It never takes the click. ----
   var LOUPE = 220;
   function setLoupe(pt) {
-    var L = C.look;
-    if (!pt || !L || L.phase !== 'shown') { wuLoupe.hidden = true; if (L) L.loupe = null; $('wuLoupeBtn').setAttribute('aria-pressed', 'false'); return; }
-    L.loupe = pt;
-    var img = $('wuImg'), r = img.getBoundingClientRect(), nat = L.natural || { w: L.plan.v[2], h: L.plan.v[3] };
-    var shown = r.width / nat.w;                                 // screen px per photo px now
-    var dpr = window.devicePixelRatio || 1;
-    var magMax = Math.max(1, 1 / (shown * dpr));                 // magnification at which one photo px = one device px
-    if (magMax < 1.1) { wuLoupe.hidden = true; L.loupe = null; return; }   // the full detail is already on screen
-    pt.mag = clamp(pt.mag || 2.5, Math.min(1.25, magMax), magMax);
-    var k = shown * pt.mag;                                      // screen px per photo px inside the glass
-    var u = (pt.x - r.left) / shown, v = (pt.y - r.top) / shown;  // the photo pixel under the centre
+    var L = C.look, a = L && layerOf(L.st);
+    if (!pt || !L || L.phase !== 'shown' || !a || wuArt.hidden) { wuLoupe.hidden = true; if (L) L.loupe = null; return; }
+    var r = wuArt.getBoundingClientRect(); if (!r.width) return;
+    var shown = r.width / a.w, dpr = window.devicePixelRatio || 1, magMax = Math.max(1, 1 / (shown * dpr));
+    if (magMax < 1.1) { wuLoupe.hidden = true; L.loupe = null; return; }
+    if (pt.x < r.left || pt.x > r.right || pt.y < r.top || pt.y > r.bottom) { wuLoupe.hidden = true; L.loupe = null; return; }
+    L.loupe = pt; pt.mag = clamp(pt.mag || Math.min(2.5, magMax), Math.min(1.25, magMax), magMax);
+    var k = shown * pt.mag, u = (pt.x - r.left) / shown, v = (pt.y - r.top) / shown;
     var cx = pt.x, cy = pt.y - (pt.above ? LOUPE * 0.75 : 0);
     wuLoupe.style.left = (cx - LOUPE / 2).toFixed(1) + 'px'; wuLoupe.style.top = (cy - LOUPE / 2).toFixed(1) + 'px';
-    wuLoupe.style.backgroundImage = 'url("' + img.getAttribute('src') + '")';
-    wuLoupe.style.backgroundSize = (nat.w * k).toFixed(1) + 'px ' + (nat.h * k).toFixed(1) + 'px';
+    wuLoupe.style.backgroundImage = 'url("' + a.src + '")';
+    wuLoupe.style.backgroundSize = (a.w * k).toFixed(1) + 'px ' + (a.h * k).toFixed(1) + 'px';
     wuLoupe.style.backgroundPosition = (LOUPE / 2 - u * k).toFixed(1) + 'px ' + (LOUPE / 2 - v * k).toFixed(1) + 'px';
     wuLoupe.hidden = false;
-    $('wuLoupeBtn').setAttribute('aria-pressed', 'true');
   }
-  // How much more detail the decoded photograph holds than the screen shows now (device pixels per photo pixel).
-  function loupeHeadroom(L) { var img = $('wuImg'), w = img.getBoundingClientRect().width, nat = L.natural ? L.natural.w : L.plan.v[2]; return w ? nat / (w * (window.devicePixelRatio || 1)) : 1; }
-  function loupeCentre() { var r = $('wuImg').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, mag: 2.5 }; }
+  function loupeHeadroom() { var L = C.look, a = L && layerOf(L.st); if (!a || !L.cam) return 1; var r = layerRect(L.st); return r ? a.w / (r.w * L.cam.s * (window.devicePixelRatio || 1)) : 1; }
 
-  // ---- Gestures on the walked-up photograph. One owner per gesture (Astra's review): pinch cancels swipe and hold,
-  // hold cancels tap, double-tap cancels the single tap; at fit a horizontal swipe changes pieces, zoomed a drag pans.
-  var G2 = { ptrs: {}, mode: null, t0: 0, x0: 0, y0: 0, lastTap: 0, holdT: 0, d0: 0, z0: 1, moved: false };
-  function onPhoto(x, y) { var r = wuFrame.getBoundingClientRect(); return !wuFrame.hidden && x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; }
+  // ---- Pointer: clicks step levels, drags pan a zoomed view or swipe pieces, pinch and wheel zoom the camera. ----
+  // The art's own box (the layer's rectangle has empty margins around the piece).
+  function hitArt(x, y) { var L = C.look, r = L && artRect(L.st); if (!r) return false; var q = camApply(L.cam, r); return x >= q.x && x <= q.x + q.w && y >= q.y && y <= q.y + q.h; }
+  function hitLabel(x, y) {
+    var L = C.look, l = L && labelRect(L.st); if (!l) return false; var q = camApply(L.cam, l);
+    var ex = Math.max(0, (44 - q.w) / 2), ey = Math.max(0, (44 - q.h) / 2);
+    return x >= q.x - ex && x <= q.x + q.w + ex && y >= q.y - ey && y <= q.y + q.h + ey;
+  }
+  function focusAt(x, y) { var L = C.look, R = faceImgRect(L.st), c = L.cam; return { u: ((x - c.tx) / c.s - R.x) / R.w, v: ((y - c.ty) / c.s - R.y) / R.h }; }
+  function closer(x, y) {
+    var L = C.look; if (!L || L.phase !== 'shown') return;
+    if (L.level === 'look') dispatch({ type: 'go', hash: lookHash(L.st, 'detail'), focus: focusAt(x, y) });
+    else if (L.level === 'detail') setLookLevel('detail', focusAt(x, y));        // already close: the view centres there
+  }
+  // Free zoom (wheel, pinch, + and -): the camera scales about a point, between the walk-up framing and native.
+  function zoomCam(f, x, y) {
+    var L = C.look; if (!L || L.phase !== 'shown' || L.level === 'label') return;
+    var lo = lookCam(L.st).s, hi = detailScale(L.st), c = L.cam, s = clamp(c.s * f, lo, hi);
+    if (x == null) { var A = area(); x = A.x + A.w / 2; y = A.y + A.h / 2; }
+    var k = s / c.s; L.cam = clampCam({ s: s, tx: x - k * (x - c.tx), ty: y - k * (y - c.ty) }, L.st); L.to = L.cam;
+    L.freeZoom = s > lo * 1.01; updateZoomTools(); placeCardLink(); kick();
+  }
+  function panCam(dx, dy, base) { var L = C.look; L.cam = clampCam({ s: base.s, tx: base.tx + dx, ty: base.ty + dy }, L.st); L.to = L.cam; kick(); }
+  function zoomed() { var L = C.look; return !!L && (L.level === 'detail' || L.freeZoom); }
+  var G2 = { ptrs: {}, mode: null, t0: 0, x0: 0, y0: 0, holdT: 0, d0: 0, s0: 1, moved: false };
   WU.addEventListener('pointerdown', function (e) {
     var L = C.look; if (!L || L.phase !== 'shown') return;
-    if (e.target.closest && e.target.closest('button, a, .wu-label')) return;
+    if (e.target.closest && e.target.closest('button, a')) return;
     e.preventDefault();                                           // no selection or image drag from the stage
     G2.ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
     var n = Object.keys(G2.ptrs).length;
     try { WU.setPointerCapture(e.pointerId); } catch (err) { /* optional */ }
-    if (n === 2) {                                                // pinch: cancels swipe, hold and taps
-      clearTimeout(G2.holdT); var p = Object.values(G2.ptrs); G2.mode = 'pinch'; G2.d0 = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); G2.z0 = L.zoom.z; setLoupe(null); return;
-    }
-    G2.mode = 'down'; G2.t0 = now(); G2.x0 = e.clientX; G2.y0 = e.clientY; G2.moved = false; G2.zx = L.zoom.x; G2.zy = L.zoom.y; G2.touch = e.pointerType !== 'mouse';
-    if (G2.touch && onPhoto(e.clientX, e.clientY)) G2.holdT = setTimeout(function () { if (G2.mode === 'down' && !G2.moved) { G2.mode = 'hold'; setLoupe({ x: G2.x0, y: G2.y0, above: true }); } }, 450);
+    if (n === 2) { clearTimeout(G2.holdT); var p = Object.values(G2.ptrs); G2.mode = 'pinch'; G2.d0 = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); G2.s0 = L.cam.s; setLoupe(null); return; }
+    G2.mode = 'down'; G2.t0 = now(); G2.x0 = e.clientX; G2.y0 = e.clientY; G2.moved = false; G2.cam0 = { s: L.cam.s, tx: L.cam.tx, ty: L.cam.ty }; G2.touch = e.pointerType !== 'mouse';
+    if (G2.touch && L.level !== 'label' && hitArt(e.clientX, e.clientY)) G2.holdT = setTimeout(function () { if (G2.mode === 'down' && !G2.moved) { G2.mode = 'hold'; setLoupe({ x: G2.x0, y: G2.y0, above: true }); } }, 450);
   });
   WU.addEventListener('pointermove', function (e) {
     var L = C.look; if (!L || L.phase !== 'shown') return;
-    if (!G2.ptrs[e.pointerId]) { if (e.pointerType === 'mouse' && L.loupe && onPhoto(e.clientX, e.clientY)) setLoupe({ x: e.clientX, y: e.clientY, mag: L.loupe.mag }); return; }
+    if (!G2.ptrs[e.pointerId]) {                                  // hover: the loupe follows a mouse while it is switched on
+      if (e.pointerType === 'mouse' && L.loupeOn) setLoupe({ x: e.clientX, y: e.clientY, mag: L.loupe && L.loupe.mag });
+      WU.classList.toggle('over-art', e.pointerType === 'mouse' && L.level !== 'label' && hitArt(e.clientX, e.clientY) && !L.loupeOn);
+      WU.classList.toggle('over-label', e.pointerType === 'mouse' && L.level === 'look' && hitLabel(e.clientX, e.clientY));
+      return;
+    }
     G2.ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
-    if (G2.mode === 'pinch') { var p = Object.values(G2.ptrs); if (p.length === 2) { var d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); zoomAt(G2.z0 * d / G2.d0 / L.zoom.z, (p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2); } return; }
+    if (G2.mode === 'pinch') { var p = Object.values(G2.ptrs); if (p.length === 2) { var d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); zoomCam(G2.s0 * d / G2.d0 / L.cam.s, (p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2); } return; }
     var dx = e.clientX - G2.x0, dy = e.clientY - G2.y0;
     if (Math.hypot(dx, dy) > 8) { G2.moved = true; if (G2.mode !== 'hold') clearTimeout(G2.holdT); }
     if (G2.mode === 'hold') { setLoupe({ x: e.clientX, y: e.clientY, above: true, mag: L.loupe && L.loupe.mag }); return; }
-    if (G2.mode === 'down' && G2.moved) G2.mode = L.zoom.z > 1 + 1e-3 ? 'pan' : 'swipe';
-    if (G2.mode === 'pan') { L.zoom.x = G2.zx + dx; L.zoom.y = G2.zy + dy; placeLookPhoto(); }
+    if (G2.mode === 'down' && G2.moved) G2.mode = zoomed() ? 'pan' : 'swipe';
+    if (G2.mode === 'pan') panCam(dx, dy, G2.cam0);
   });
   function endPtr(e, cancel) {
     var L = C.look, was = G2.ptrs[e.pointerId]; delete G2.ptrs[e.pointerId];
@@ -6488,29 +7090,25 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     if (!L || L.phase !== 'shown' || cancel) { if (mode === 'hold') setLoupe(null); return; }
     var dx = e.clientX - G2.x0, dy = e.clientY - G2.y0;
     if (mode === 'hold') { setLoupe(null); return; }
-    if (mode === 'swipe') { if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) navLook(dx < 0 ? 1 : -1); return; }
+    if (mode === 'swipe') { if (L.level === 'look' && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) navLook(dx < 0 ? 1 : -1); return; }
     if (mode === 'pinch' || mode === 'pan') return;
-    // a tap or click
-    var x = e.clientX, y = e.clientY, inPhoto = onPhoto(x, y);
-    if (!inPhoto) { lookBackOut(); return; }                      // backdrop only: outside the photo and label
-    if (G2.touch) {
-      var t = now();
-      if (t - G2.lastTap < 300) { G2.lastTap = 0; clearTimeout(G2.tapT); zoomAt(L.zoom.z > 1 + 1e-3 ? 1 / L.zoom.z : Math.min(2, maxZoom(L)) / L.zoom.z, x, y); return; }
-      G2.lastTap = t; return;                                     // a single tap on the photo does nothing on touch
-    }
-    if (L.loupe) setLoupe(null); else setLoupe({ x: x, y: y, mag: 2.5 });   // desktop click toggles the loupe
+    var x = e.clientX, y = e.clientY;                             // a click or tap
+    if (L.alt != null) { closeAlt(); renderViews(); return; }
+    if (L.level === 'look' && hitLabel(x, y)) { dispatch({ type: 'go', hash: lookHash(L.st, 'label') }); return; }
+    if (L.level === 'label') { if (!hitLabel(x, y)) lookBackOut(); return; }
+    if (hitArt(x, y)) { closer(x, y); return; }
+    lookBackOut();                                                // outside the art and the label: one level out
   }
   WU.addEventListener('pointerup', function (e) { endPtr(e, false); });
   WU.addEventListener('pointercancel', function (e) { endPtr(e, true); });
   WU.addEventListener('lostpointercapture', function (e) { if (G2.ptrs[e.pointerId]) endPtr(e, true); });
-  // Wheel: a two-finger horizontal swipe moves one piece per gesture (180 ms quiet ends it); vertical scroll zooms the
-  // photograph, or changes the loupe's magnification while the loupe is on.
+  // Wheel: a two-finger horizontal swipe moves one piece per gesture at the walk-up level (180 ms quiet ends it);
+  // vertical scroll zooms the camera, or sets the loupe's magnification while the loupe is on.
   var WUW = null;
   WU.addEventListener('wheel', function (e) {
     var L = C.look; if (!L) return;
-    if (e.target.closest && e.target.closest('.wu-label')) return;
     e.preventDefault();
-    if (WUW || (Math.abs(e.deltaX) > Math.abs(e.deltaY) && L.zoom.z <= 1 + 1e-3)) {
+    if (WUW || (Math.abs(e.deltaX) > Math.abs(e.deltaY) && !zoomed() && L.level === 'look')) {
       if (!WUW) WUW = { acc: 0, done: false, t: 0 };
       WUW.acc += e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX;
       if (!WUW.done && Math.abs(WUW.acc) > 70 && L.phase === 'shown') { WUW.done = true; navLook(WUW.acc > 0 ? 1 : -1); }
@@ -6519,35 +7117,38 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     }
     if (L.phase !== 'shown') return;
     var f = Math.exp(-e.deltaY * 0.002);
-    if (L.loupe) setLoupe({ x: L.loupe.x, y: L.loupe.y, above: L.loupe.above, mag: (L.loupe.mag || 2.5) * f });   // wheel drives the loupe when it is on
-    else zoomAt(f, e.clientX, e.clientY);
+    if (L.loupe) setLoupe({ x: L.loupe.x, y: L.loupe.y, above: L.loupe.above, mag: (L.loupe.mag || 2.5) * f });
+    else zoomCam(f, e.clientX, e.clientY);
   }, { passive: false });
 
   // ---- Controls and keys. ----
-  // The latest request wins: Left/Right during a slide or a wait retargets from where the camera is now.
-  function navLook(dir) { var L = C.look; if (L && (L.phase === 'shown' || L.phase === 'slide' || L.phase === 'wait')) slideLook(dir); }
+  function navLook(dir) { var L = C.look; if (L && L.level === 'look' && (L.phase === 'shown' || L.phase === 'slide')) slideLook(dir); }
   function lookBackOut() { goBack(); }
   wuBack.addEventListener('click', lookBackOut);
   wuPrev.addEventListener('click', function () { navLook(-1); });
   wuNext.addEventListener('click', function () { navLook(1); });
-  $('wuZoomIn').addEventListener('click', function () { zoomAt(1.6); });
-  $('wuZoomOut').addEventListener('click', function () { zoomAt(1 / 1.6); });
-  $('wuFit').addEventListener('click', function () { var L = C.look; if (L) { L.zoom = { z: 1, x: 0, y: 0 }; placeLookPhoto(); if (L.loupe) setLoupe(loupeCentre()); } });
-  $('wuLoupeBtn').addEventListener('click', function () { var L = C.look; if (!L) return; if (L.loupe) setLoupe(null); else setLoupe(loupeCentre()); });
-  $('wuLink').addEventListener('click', function () { var L = C.look; if (L) copyLink(baseUrl() + '#' + lookHash(L.st), $('wuLink')); });
-  $('wuExpand').addEventListener('click', function () { var on = !wuLabel.classList.contains('expanded'); wuLabel.classList.toggle('expanded', on); $('wuExpand').setAttribute('aria-expanded', on ? 'true' : 'false'); });
-  // Keys while walked up: on the document in the capture phase, so they arrive even while the label is swapping (focus on
-  // the dialog itself) and before the gallery's own keys or the global Esc.
+  $('wuZoomIn').addEventListener('click', function () { var L = C.look; if (L && L.level === 'look') dispatch({ type: 'go', hash: lookHash(L.st, 'detail') }); });
+  $('wuZoomOut').addEventListener('click', function () { var L = C.look; if (!L) return; if (L.freeZoom && L.level === 'look') setLookLevel('look'); else lookBackOut(); });
+  $('wuLoupeBtn').addEventListener('click', function () {
+    var L = C.look; if (!L) return; L.loupeOn = !L.loupeOn;
+    if (L.loupeOn) { var r = wuArt.getBoundingClientRect(); setLoupe({ x: r.left + r.width / 2, y: r.top + r.height / 2 }); } else setLoupe(null);
+    updateZoomTools();
+  });
+  wuLink.addEventListener('click', function () { var L = C.look; if (L) copyLink(baseUrl() + '#' + lookHash(L.st), wuLink); });
+  // Keys while walked up: on the document in the capture phase, before the gallery's own keys and the global Esc.
   WU.tabIndex = -1;
   document.addEventListener('keydown', function (e) {
     var L = C.look; if (!L || C.menuOpen) return;
-    if (e.key === 'Escape') {                                      // the innermost layer first: loupe, zoom, then the walk-up
+    if (e.key === 'Escape') {                                      // the innermost first: loupe, other photograph, zoom, level
       e.preventDefault(); e.stopPropagation();
-      if (L.loupe) setLoupe(null); else if (L.zoom.z > 1 + 1e-3) { L.zoom = { z: 1, x: 0, y: 0 }; placeLookPhoto(); } else lookBackOut();
+      if (L.loupe || L.loupeOn) { L.loupeOn = false; setLoupe(null); updateZoomTools(); }
+      else if (L.alt != null) { closeAlt(); renderViews(); }
+      else if (L.freeZoom && L.level === 'look') setLookLevel('look');
+      else lookBackOut();
       return;
     }
     if (e.altKey || e.ctrlKey || e.metaKey) return;
-    if (L.phase !== 'shown') {                                    // mid-slide: Left/Right retarget, everything else waits
+    if (L.phase !== 'shown') {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); navLook(e.key === 'ArrowRight' ? 1 : -1); }
       return;
     }
@@ -6555,56 +7156,73 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     var step = 40;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
-      if (L.loupe) { var lp = L.loupe; setLoupe({ x: lp.x + (e.key === 'ArrowRight' ? step : -step), y: lp.y, mag: lp.mag }); }
-      else if (L.zoom.z > 1 + 1e-3) { L.zoom.x += e.key === 'ArrowRight' ? -step : step; placeLookPhoto(); }
-      else navLook(e.key === 'ArrowRight' ? 1 : -1);
+      if (zoomed()) panCam(e.key === 'ArrowRight' ? -step : step, 0, L.cam); else navLook(e.key === 'ArrowRight' ? 1 : -1);
     } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      if (L.loupe) { e.preventDefault(); var lq = L.loupe; setLoupe({ x: lq.x, y: lq.y + (e.key === 'ArrowDown' ? step : -step), mag: lq.mag }); }
-      else if (L.zoom.z > 1 + 1e-3) { e.preventDefault(); L.zoom.y += e.key === 'ArrowDown' ? -step : step; placeLookPhoto(); }
-    } else if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomAt(1.6); }
-    else if (e.key === '-') { e.preventDefault(); zoomAt(1 / 1.6); }
+      if (zoomed()) { e.preventDefault(); panCam(0, e.key === 'ArrowDown' ? -step : step, L.cam); }
+    } else if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomCam(1.6); }
+    else if (e.key === '-') { e.preventDefault(); zoomCam(1 / 1.6); }
     else if (e.key === 'l' || e.key === 'L') { e.preventDefault(); $('wuLoupeBtn').click(); }
-    else if (e.key === 'Tab') {                                    // focus stays inside the walk-up
-      var f = [].slice.call(WU.querySelectorAll('button, a[href], [tabindex="-1"]#wuTitle')).filter(function (x) { return !x.hidden && x.offsetParent !== null && !x.disabled; });
+    else if (e.key === 'Enter' && L.level === 'look' && document.activeElement === $('wuTitle')) { e.preventDefault(); dispatch({ type: 'go', hash: lookHash(L.st, 'label') }); }
+    else if (e.key === 'Tab') {                                    // focus stays inside the close-up
+      var f = [].slice.call(WU.querySelectorAll('button, a[href], #wuTitle')).filter(function (x) { return !x.hidden && x.offsetParent !== null && !x.disabled; });
       var i = f.indexOf(document.activeElement);
       if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
       else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
     }
   }, true);
-  // In the gallery: the work in front can be walked up to by clicking it, or with its named button (keyboard).
+
+  // ---- In the gallery: a click on the work in front walks up; a click on its wall label reads it close. ----
+  function atRest() { return canDrag() && !C.look && !C.yawSeg && !WH; }
   function artAt(x, y) {
-    if (!canDrag() || C.look || C.yawSeg || WH) return -1;            // during a turn a click steps, never walks up
+    if (!atRest()) return -1;                                    // during a turn a click steps, never walks up
     var i = nearestIdx(C.yaw), dd = Math.abs(wrap180(ST[i].yawDeg - C.yaw)); if (dd > 0.5) return -1;
     var a = artRect(i); return a && x >= a.x && x <= a.x + a.w && y >= a.y && y <= a.y + a.h ? i : -1;
   }
+  function labelAt(x, y) {
+    if (!atRest()) return -1;
+    var i = nearestIdx(C.yaw), dd = Math.abs(wrap180(ST[i].yawDeg - C.yaw)); if (dd > 0.5) return -1;
+    var l = labelRect(i); if (!l) return -1;
+    var ex = Math.max(0, (44 - l.w) / 2), ey = Math.max(0, (44 - l.h) / 2);     // at least 44 x 44 px to tap
+    return x >= l.x - ex && x <= l.x + l.w + ex && y >= l.y - ey && y <= l.y + l.h + ey ? i : -1;
+  }
+  function readLabel(i) { dispatch({ type: 'go', hash: lookHash(i, 'look') }); dispatch({ type: 'go', hash: lookHash(i, 'label') }); }
   workRoom.addEventListener('click', function (e) {
     if (suppressClick || e.defaultPrevented || (e.target.closest && e.target.closest('button, a, .index, .plate'))) return;
+    var j = labelAt(e.clientX, e.clientY); if (j >= 0) { e.preventDefault(); readLabel(j); return; }
     var i = artAt(e.clientX, e.clientY); if (i < 0) return;
     e.preventDefault(); dispatch({ type: 'go', hash: lookHash(i) });
   });
-  // The art shows a zoom-in cursor under a mouse (the named button above it is for the keyboard only).
   workRoom.addEventListener('pointermove', function (e) {
     if (e.pointerType !== 'mouse' || C.drag) return;
-    var on = artAt(e.clientX, e.clientY) >= 0; if (on !== workRoom._artCur) { workRoom._artCur = on; workRoom.classList.toggle('over-art', on); }
+    var on = artAt(e.clientX, e.clientY) >= 0 || labelAt(e.clientX, e.clientY) >= 0; if (on !== workRoom._artCur) { workRoom._artCur = on; workRoom.classList.toggle('over-art', on); }
   });
   artTarget.addEventListener('click', function () { var i = nearestIdx(C.yaw); dispatch({ type: 'go', hash: lookHash(i) }); });
+  labelTarget.addEventListener('click', function () { readLabel(nearestIdx(C.yaw)); });
+  // The keyboard-only buttons sit over the art and the label (no pointer input, so drags start on the stage).
   var artKey = '';
-  function placeArtTarget(on) {                                   // writes only on change: it runs every frame
-    var i = on ? nearestIdx(C.yaw) : -1, a = on ? artRect(i) : null;
-    var key = a ? [i, a.x.toFixed(1), a.y.toFixed(1), a.w.toFixed(1), a.h.toFixed(1)].join(',') : '';
-    if (key === artKey) return; artKey = key;
-    if (!a) { artTarget.hidden = true; return; }
-    var Lb = labelOf(ST[i].id);
-    artTarget.hidden = false;
-    artTarget.style.left = a.x.toFixed(1) + 'px'; artTarget.style.top = a.y.toFixed(1) + 'px'; artTarget.style.width = a.w.toFixed(1) + 'px'; artTarget.style.height = a.h.toFixed(1) + 'px';
-    artTarget.textContent = 'Look closely at ' + (Lb.title || Lb.kind || 'this work');
+  function placeTarget(btn, r, text) {
+    btn.hidden = false;
+    btn.style.left = r.x.toFixed(1) + 'px'; btn.style.top = r.y.toFixed(1) + 'px'; btn.style.width = Math.max(r.w, 4).toFixed(1) + 'px'; btn.style.height = Math.max(r.h, 4).toFixed(1) + 'px';
+    if (btn.textContent !== text) btn.textContent = text;
   }
-  // Resize while walked up: the frame is recomputed for the new layout (no half-old geometry).
+  function placeArtTarget(on) {                                   // writes only on change: it runs every frame
+    var i = on ? nearestIdx(C.yaw) : -1, a = on ? artRect(i) : null, l = on ? labelRect(i) : null;
+    var key = a ? [i, a.x.toFixed(1), a.y.toFixed(1), a.w.toFixed(1), a.h.toFixed(1), l ? l.x.toFixed(1) + l.y.toFixed(1) : ''].join(',') : '';
+    if (key === artKey) return; artKey = key;
+    if (!a) { artTarget.hidden = true; labelTarget.hidden = true; return; }
+    var lay = layerOf(i); if (lay) asset(lay.src, 'low');          // standing at a piece: its art layer loads before any walk-up
+    var Lb = labelOf(ST[i].id), name = Lb.title || Lb.kind || 'this work';
+    placeTarget(artTarget, a, 'Look closely at ' + name);
+    if (l) placeTarget(labelTarget, l, 'Read the label for ' + name); else labelTarget.hidden = true;
+    var d = $('stationDesc'); d.textContent = [Lb.title, Lb.year, Lb.materials, Lb.dimensions, Lb.award].filter(Boolean).join('. ');
+  }
+  // Resize while walked up: the camera target is recomputed for the new layout (no half-old geometry).
   function lookResize() {
     var L = C.look; if (!L) return;
-    var tg = lookTarget(L.st, L.plan);
-    if (L.phase === 'shown' || L.phase === 'wait') { L.cam = L.to = tg.cam; L.photo = tg.photo; placeLookPhoto(); if (L.phase === 'shown') placeWuLabel(); }
-    else L.to = tg.cam;
+    var to = camFor(L.st, L.level, L.focus);
+    if (L.phase === 'shown') { L.cam = L.to = to; L.freeZoom = false; placeCardLink(); updateZoomTools(); }
+    else L.to = to;
+    if (L.alt != null) openAlt(L.alt);
   }
 
   (function start() {
@@ -6622,7 +7240,7 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
     }
     if (r.index) { setIndex(r.index, tm); C.indexA = Tween(1); if (r.index.level === 3) C.plateA = Tween(1); }
     if (r.station != null) jumpToStation(r.station);
-    if (r.look) enterLook(r.station, { direct: true });          // a link to a walked-up piece opens there, without the step
+    if (r.look) enterLook(r.station, { direct: true, level: r.level });          // a link to a walked-up piece opens there, without the step
     C.ui = Tween(r.room === 'work' && !r.index ? 1 : 0);
     updateNav(); announce();
     render(tm);
@@ -6651,6 +7269,8 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
   }
   var HOOK = {
     version: 'r6',
+    // Round 9: the close-up's geometry, for the walk-up checks (camera, and the art, label and art-layer rectangles on screen).
+    lookGeom: function () { var L = C.look; if (!L) return null; var g = function (r) { return r ? camApply(L.cam, r) : null; }; return { cam: L.cam, level: L.level, art: g(artRect(L.st)), layer: g(layerRect(L.st)), label: g(labelRect(L.st)), area: area(), pict: g(faceImgRect(L.st)) }; },
     scene: SCENE,
     state: function () {
       var tm = now(), m = modeName(tm), progress;
@@ -6661,6 +7281,7 @@ a.crumb { border-bottom: 1px solid var(--rule); padding-bottom: 2px; }
       var a = document.activeElement, v = activeView();
       return {
         mode: m,
+        look: C.look ? { level: C.look.level, phase: C.look.phase, scale: +C.look.cam.s.toFixed(4), alt: C.look.alt } : null,
         view: C.look ? 'look' : C.viewer ? 'viewer' : C.view === 'index' ? 'index:' + C.idx.level : C.intent.room === 'work' ? 'walk' : 'room:' + C.intent.room,
         hash: curHash(), transitioning: busy(tm), progress: progress, visibleLayers: visibleLayers(tm),
         activeElementInView: !!(a && v && (v === a || v.contains(a))),
