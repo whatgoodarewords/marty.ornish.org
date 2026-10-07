@@ -137,7 +137,10 @@ html:not([data-logo]) .logo-short { display: block; }
 /* The room seen through a doorway: drawn above the gallery, clipped to the opening, scaled slower than the wall. */
 .room-layer { position: absolute; inset: 0; z-index: 1; overflow: hidden; visibility: hidden; pointer-events: none; }
 .room-layer img { position: absolute; left: 0; top: 0; transform-origin: 0 0; max-width: none; }
-.ring { position: absolute; inset: 0; overflow: hidden; perspective-origin: 50% 50%; }
+/* The ring does not clip (round 10.1): the gallery's section clips at the screen edge, so a close-up that looks past the
+   1x view (a label beside a wide piece on a phone) shows the photographed wall there instead of black. */
+.ring { position: absolute; inset: 0; perspective-origin: 50% 50%; }
+.prime-cover { position: fixed; inset: 0; z-index: 2147483000; background: var(--black); pointer-events: none; }
 .face { position: absolute; top: -30%; height: 160%; overflow: hidden; visibility: hidden; backface-visibility: hidden; }
 .face {
   --bl: 0%; --br: 0%;
@@ -705,6 +708,20 @@ html.walked-up .menu { z-index: 46; }
 .wu-tools::before { content: ""; position: absolute; z-index: -1; inset: -18px -40px -14px -30px; background: radial-gradient(closest-side, rgba(0,0,0,.72), rgba(0,0,0,0)); pointer-events: none; }
 .wu-back::after { content: ""; position: absolute; z-index: -1; inset: -10px -30px; background: radial-gradient(closest-side, rgba(0,0,0,.6), rgba(0,0,0,0)); pointer-events: none; }
 .walkup.under-menu .wu-tools, .walkup.under-menu .wu-back, .walkup.under-menu .wu-nav, .walkup.under-menu .wu-link { visibility: hidden; }
+/* Round 10.1: doorways. The room's name painted on the wall above each opening, in the wall plane and the room's light
+   (warm light grey, museum-signage size), and an invisible target over the opening. */
+.face-mark { -webkit-mask-image: none; mask-image: none; pointer-events: none; }
+.mark-plane { -webkit-mask-image: none; mask-image: none; }
+.door-sign { position: absolute; margin: 0; text-align: center; font-family: var(--font); font-weight: 500; letter-spacing: .06em; line-height: 1.15;
+  color: rgba(214, 205, 190, .78); text-shadow: 0 0 1px rgba(0,0,0,.35); white-space: nowrap; pointer-events: none; -webkit-user-select: none; user-select: none; }
+.door-hit { position: absolute; pointer-events: none; }
+.room-work.over-door, .room-work.over-door .zone { cursor: pointer; }
+.door-target { pointer-events: none; }
+.door-target:focus-visible { outline: 1px solid var(--white); outline-offset: 4px; }
+.wu-enh { align-self: center; margin-left: 6px; font-size: 13px; color: var(--muted); }
+.wu-enh[hidden] { display: none; }
+.face-wl { -webkit-mask-image: none; mask-image: none; pointer-events: none; }
+.wl-plane { -webkit-mask-image: none; mask-image: none; }
 </style>
 
 <header class="top">
@@ -850,6 +867,7 @@ html.walked-up .menu { z-index: 46; }
     <button class="wu-tool" id="wuZoomOut" type="button">Zoom out</button>
     <button class="wu-tool" id="wuZoomIn" type="button">Zoom in</button>
     <button class="wu-tool" id="wuLoupeBtn" type="button" aria-pressed="false">Magnifier</button>
+    <span class="wu-enh" id="wuEnhNote" hidden>Enhanced beyond the original photograph</span>
     <span class="wu-views" id="wuViews" role="group" aria-label="Photographs" hidden></span>
   </div>
   <button class="wu-back" id="wuBack" type="button" hidden>Back to gallery</button>
@@ -943,22 +961,22 @@ html.walked-up .menu { z-index: 46; }
         "id": "all-tied-up",
         "slug": "all-tied-up",
         "title": "All Tied Up",
-        "img": "img/g10/station-all-tied-up.jpg?v=1b01e23f",
-        "imgPortrait": "img/g10/station-all-tied-up.jpg?v=1b01e23f",
+        "img": "img/g10v2/station-all-tied-up.jpg?v=40637bd2",
+        "imgPortrait": "img/g10v2/station-all-tied-up.jpg?v=40637bd2",
         "floorY": 960,
         "floorYPortrait": 960,
         "yawDeg": 0,
         "art": [
-          0.2389,
-          0.6934,
-          0.3874,
-          0.597
+          0.2259,
+          0.6986,
+          0.3893,
+          0.6068
         ],
         "artPortrait": [
-          0.2389,
-          0.6934,
-          0.3874,
-          0.597
+          0.2259,
+          0.6986,
+          0.3893,
+          0.6068
         ],
         "look": {
           "views": [
@@ -980,18 +998,18 @@ html.walked-up .menu { z-index: 46; }
             "Back"
           ]
         },
-        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz5xSAU5qVBmgDY0UcZqvq4/fE1PpqSS3EVtCcM5xn0Hc1FqkTxXDwyMGKnhh0I9anqPoZJFKopzCkWqEIxp8ZppjkJ+435VLHbTt0iagDb8KgNrkbsSFiRnOO/GMfrUHiHYNVfy1KgqDgnOKn0CGe2muJZYyo8rAJ+tVNVjmnvWeNGZcAZqepXQy2pgNTPBMOsbVF5cn9xvyqiTXEaGZB2JpxmaOQhcYBqFW/er9abI371vrUlFmCTUn3+VMuDyRg1GTepcBpJF46jFWtPk2h/cVFePmYml1H0GKWllCseppBGm4gnGDSWpzcp9aSQ4lb60+ouh//2Q==",
-        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz5xSAU5qVBmgDY0UcZqvq4/fE1PpqSS3EVtCcM5xn0Hc1FqkTxXDwyMGKnhh0I9anqPoZJFKopzCkWqEIxp8ZppjkJ+435VLHbTt0iagDb8KgNrkbsSFiRnOO/GMfrUHiHYNVfy1KgqDgnOKn0CGe2muJZYyo8rAJ+tVNVjmnvWeNGZcAZqepXQy2pgNTPBMOsbVF5cn9xvyqiTXEaGZB2JpxmaOQhcYBqFW/er9abI371vrUlFmCTUn3+VMuDyRg1GTepcBpJF46jFWtPk2h/cVFePmYml1H0GKWllCseppBGm4gnGDSWpzcp9aSQ4lb60+ouh//2Q==",
+        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz5xSAU5qVBmgDY0VeMmq+rj98TU+mI81zFbQnDOcZ9PU0zWIPIuniLiQDlW9RU9R9DHIpVFOYUi1QhGNPjNNMch/gb8qljtp26RNQBs+FwH12F2J2xK0hx3wOn60niUp/ae6NNgZASM8U7QIZ7a5nlljKjySMn6iq+rpLcXm+JGYBcfSp6ldDJamA1M8Ew6xtUXlyf3G/KqJNcRoZkHYmnGZo5CFxgGoVb96v1psjfvW+tSUWoJNSbf5Uy4JyRioma9S4BlkXg8gCrWnybQ/uKivHzMTS6j6DFLSyhWPU0gjTcQTjBpLU5uU+tJIcSt9afUXQ/9k=",
+        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz5xSAU5qVBmgDY0VeMmq+rj98TU+mI81zFbQnDOcZ9PU0zWIPIuniLiQDlW9RU9R9DHIpVFOYUi1QhGNPjNNMch/gb8qljtp26RNQBs+FwH12F2J2xK0hx3wOn60niUp/ae6NNgZASM8U7QIZ7a5nlljKjySMn6iq+rpLcXm+JGYBcfSp6ldDJamA1M8Ew6xtUXlyf3G/KqJNcRoZkHYmnGZo5CFxgGoVb96v1psjfvW+tSUWoJNSbf5Uy4JyRioma9S4BlkXg8gCrWnybQ/uKivHzMTS6j6DFLSyhWPU0gjTcQTjBpLU5uU+tJIcSt9afUXQ/9k=",
         "art9": {
           "land": {
             "src": "img/art/all-tied-up-landscape.webp?v=83f97301",
             "w": 686,
             "h": 900,
             "rect": [
-              0.323568,
-              0.234375,
-              0.362472,
-              0.475547
+              0.322436,
+              0.2209,
+              0.376858,
+              0.494421
             ]
           },
           "port": {
@@ -999,10 +1017,10 @@ html.walked-up .menu { z-index: 46; }
             "w": 686,
             "h": 900,
             "rect": [
-              0.323568,
-              0.234375,
-              0.362472,
-              0.475547
+              0.322436,
+              0.2209,
+              0.376858,
+              0.494421
             ]
           }
         },
@@ -1010,31 +1028,31 @@ html.walked-up .menu { z-index: 46; }
         "wallCm": null,
         "label9": {
           "land": {
-            "x": 0.61275,
-            "cy": 0.42979,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.888,
+            "x": 0.65853,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.878,
             "tint": [
               1.0,
               0.999,
-              0.992
+              0.989
             ],
-            "wallLum": 32.1,
+            "wallLum": 30.6,
             "where": "right"
           },
           "port": {
-            "x": 0.61275,
-            "cy": 0.42979,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.888,
+            "x": 0.65853,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.878,
             "tint": [
               1.0,
               0.999,
-              0.992
+              0.989
             ],
-            "wallLum": 32.1,
+            "wallLum": 30.6,
             "where": "right"
           }
         }
@@ -1043,22 +1061,22 @@ html.walked-up .menu { z-index: 46; }
         "id": "five-years",
         "slug": "five-years",
         "title": "Five Years",
-        "img": "img/g10/station-five-years.jpg?v=3cb7d64d",
-        "imgPortrait": "img/g10/station-five-years.jpg?v=3cb7d64d",
+        "img": "img/g10v2/station-five-years.jpg?v=c1e6a781",
+        "imgPortrait": "img/g10v2/station-five-years.jpg?v=c1e6a781",
         "floorY": 960,
         "floorYPortrait": 960,
         "yawDeg": 40,
         "art": [
-          0.2246,
-          0.5527,
-          0.3991,
-          0.5892
+          0.2995,
+          0.5143,
+          0.4375,
+          0.5625
         ],
         "artPortrait": [
-          0.2246,
-          0.5527,
-          0.3991,
-          0.5892
+          0.2995,
+          0.5143,
+          0.4375,
+          0.5625
         ],
         "look": {
           "views": [
@@ -1071,18 +1089,18 @@ html.walked-up .menu { z-index: 46; }
           ],
           "viewNames": null
         },
-        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzwinoOaQilQ80Aa9kv+jPUN6v7pPpU2nossD5ZgQccHgCk1OHyIouWO/IyfbFT1Ltpcx2HNKoocjrQrL61RAMaRTTmik/55t+VCwynpGaAOm8MHFjcttJIcEEduKzdaujcPFkghQegpllcajZROlvGNjnJ3KDVe6W7nffLEAf9kAVmo+9c1c/c5SNCptJ4yQCxXH61XXZgj+IGpktyVbzVYHjA9aDGoQ7UIbtVmZpovmq5bsM0sYjB5zRbcxzf7tQBsGpKNxRELBJAo5JFMmSL7CsrLyWxUO//iVxj/aNFw+dKjHo5pFFFwhPGajCJnkkU0tzTd1UQf/Z",
-        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzwinoOaQilQ80Aa9kv+jPUN6v7pPpU2nossD5ZgQccHgCk1OHyIouWO/IyfbFT1Ltpcx2HNKoocjrQrL61RAMaRTTmik/55t+VCwynpGaAOm8MHFjcttJIcEEduKzdaujcPFkghQegpllcajZROlvGNjnJ3KDVe6W7nffLEAf9kAVmo+9c1c/c5SNCptJ4yQCxXH61XXZgj+IGpktyVbzVYHjA9aDGoQ7UIbtVmZpovmq5bsM0sYjB5zRbcxzf7tQBsGpKNxRELBJAo5JFMmSL7CsrLyWxUO//iVxj/aNFw+dKjHo5pFFFwhPGajCJnkkU0tzTd1UQf/Z",
+        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzwinoOaQilQ80Aa9kv+jPUN6v7pPpTLdpWBSIEnGSBTbgyrhJQVOM4NTbUroUWHNKoocjrQrL61RIMaRTTmik/wCebflQsMp6RmgDW8OosmoMHXcBGTj8qg1iYS3uVXaFULiq8cF2nzRo6n1U4pJILknc6MSe5Oam2ty+b3bCIVNpPGSAWK4/Wq67MEfxA1MluSrearA8YHrQY1CHahDdqZJpovmq5bsM0sYjB5zRbcxzf7tQBsGpKNwCIWCSBRySKZMkX2BZWXktiod//EsjGf4jS3D50qMejmkUUHCE8ZqMImeSRTS3NN3VRB//2Q==",
+        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzwinoOaQilQ80Aa9kv+jPUN6v7pPpTLdpWBSIEnGSBTbgyrhJQVOM4NTbUroUWHNKoocjrQrL61RIMaRTTmik/wCebflQsMp6RmgDW8OosmoMHXcBGTj8qg1iYS3uVXaFULiq8cF2nzRo6n1U4pJILknc6MSe5Oam2ty+b3bCIVNpPGSAWK4/Wq67MEfxA1MluSrearA8YHrQY1CHahDdqZJpovmq5bsM0sYjB5zRbcxzf7tQBsGpKNwCIWCSBRySKZMkX2BZWXktiod//EsjGf4jS3D50qMejmkUUHCE8ZqMImeSRTS3NN3VRB//2Q==",
         "art9": {
           "land": {
             "src": "img/art/five-years-landscape.webp?v=4845ec45",
             "w": 580,
             "h": 1000,
             "rect": [
-              0.395182,
-              0.218099,
-              0.197827,
-              0.341081
+              0.435152,
+              0.294946,
+              0.129696,
+              0.223614
             ]
           },
           "port": {
@@ -1090,10 +1108,10 @@ html.walked-up .menu { z-index: 46; }
             "w": 580,
             "h": 1000,
             "rect": [
-              0.395182,
-              0.218099,
-              0.197827,
-              0.341081
+              0.435152,
+              0.294946,
+              0.129696,
+              0.223614
             ]
           }
         },
@@ -1101,32 +1119,32 @@ html.walked-up .menu { z-index: 46; }
         "wallCm": null,
         "label9": {
           "land": {
-            "x": 0.60495,
-            "cy": 0.3624,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.863,
+            "x": 0.37142,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.851,
             "tint": [
               1.0,
-              0.997,
+              0.998,
               0.983
             ],
-            "wallLum": 28.0,
-            "where": "right"
+            "wallLum": 26.2,
+            "where": "left"
           },
           "port": {
-            "x": 0.60495,
-            "cy": 0.3624,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.863,
+            "x": 0.37142,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.851,
             "tint": [
               1.0,
-              0.997,
+              0.998,
               0.983
             ],
-            "wallLum": 28.0,
-            "where": "right"
+            "wallLum": 26.2,
+            "where": "left"
           }
         }
       },
@@ -1134,22 +1152,22 @@ html.walked-up .menu { z-index: 46; }
         "id": "resilience",
         "slug": "resilience",
         "title": "Altar of Resilience",
-        "img": "img/g10/station-resilience.jpg?v=e7bfbf63",
-        "imgPortrait": "img/g10/station-resilience.jpg?v=e7bfbf63",
+        "img": "img/g10v2/station-resilience.jpg?v=dd63321b",
+        "imgPortrait": "img/g10v2/station-resilience.jpg?v=dd63321b",
         "floorY": 960,
         "floorYPortrait": 960,
         "yawDeg": 80,
         "art": [
-          0.1673,
-          0.6452,
-          0.3678,
-          0.6107
+          0.2135,
+          0.5794,
+          0.4069,
+          0.5924
         ],
         "artPortrait": [
-          0.1673,
-          0.6452,
-          0.3678,
-          0.6107
+          0.2135,
+          0.5794,
+          0.4069,
+          0.5924
         ],
         "look": {
           "views": [
@@ -1162,18 +1180,18 @@ html.walked-up .menu { z-index: 46; }
           ],
           "viewNames": null
         },
-        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzwjmpEHNNb5cFsgHpkdacjDPBoA1bNf3RqK/XhfpUun5ZWJ6fdHB60zUVxhgT6EY4HAqepXQzGFCClamg1RJLclZLe3wwyiHP5molK8Fe45qXyF2IWDM2ORjpSNEfl8tD70hlyzuAE8sIAw5GOppl3ITHGpzkZzk1DHHOh3CM9MdaJYpQFAUnA9aOo76ELGo81I0cn9w0zy5P7jflTJNV0X1JoRYweRTC3FNB5qSjUIjFgrqv3mIzUWIvshdlz82M04t/xK4h/tmomP8AxLsf7f8ASpKKzBCeBV61t4nA3g/hWbnmtOxf50HvVEo//9k=",
-        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzwjmpEHNNb5cFsgHpkdacjDPBoA1bNf3RqK/XhfpUun5ZWJ6fdHB60zUVxhgT6EY4HAqepXQzGFCClamg1RJLclZLe3wwyiHP5molK8Fe45qXyF2IWDM2ORjpSNEfl8tD70hlyzuAE8sIAw5GOppl3ITHGpzkZzk1DHHOh3CM9MdaJYpQFAUnA9aOo76ELGo81I0cn9w0zy5P7jflTJNV0X1JoRYweRTC3FNB5qSjUIjFgrqv3mIzUWIvshdlz82M04t/xK4h/tmomP8AxLsf7f8ASpKKzBCeBV61t4nA3g/hWbnmtOxf50HvVEo//9k=",
+        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzwjmpEHNNb5cFsgHpkdacjDPBoA1bNf3RqK/XgfSks2aR9gJAxk4pL5WjYAnIqepXQoMKEFK1NBqiSW5KyW9vhhlEOfzNRKV4K9xzUvkLsQsGZscjHSkaI/L5aH3pDJ7Ofy324Hzd+9F3Lv2c5wOuahWGcciM/Wh45jj92eBjrQF9CNjUeakaOT+4aZ5cn9xvypiNV0X1JoRYweRTC3FNB5qSjVxCLBX2feYjNQ4h+yl9n8WM04t/xK4h/tmomP8AxLsf7f8ASpKKzBCeBV61t4nA3g/hWbnmtOxf50HvVEo//9k=",
+        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzwjmpEHNNb5cFsgHpkdacjDPBoA1bNf3RqK/XgfSks2aR9gJAxk4pL5WjYAnIqepXQoMKEFK1NBqiSW5KyW9vhhlEOfzNRKV4K9xzUvkLsQsGZscjHSkaI/L5aH3pDJ7Ofy324Hzd+9F3Lv2c5wOuahWGcciM/Wh45jj92eBjrQF9CNjUeakaOT+4aZ5cn9xvypiNV0X1JoRYweRTC3FNB5qSjVxCLBX2feYjNQ4h+yl9n8WM04t/xK4h/tmomP8AxLsf7f8ASpKKzBCeBV61t4nA3g/hWbnmtOxf50HvVEo//9k=",
         "art9": {
           "land": {
             "src": "img/art/resilience-landscape.webp?v=1e2ad6e6",
             "w": 568,
             "h": 1000,
             "rect": [
-              0.35026,
-              0.167318,
-              0.281596,
-              0.495768
+              0.393501,
+              0.213537,
+              0.215656,
+              0.379676
             ]
           },
           "port": {
@@ -1181,10 +1199,10 @@ html.walked-up .menu { z-index: 46; }
             "w": 568,
             "h": 1000,
             "rect": [
-              0.35026,
-              0.167318,
-              0.281596,
-              0.495768
+              0.393501,
+              0.213537,
+              0.215656,
+              0.379676
             ]
           }
         },
@@ -1192,31 +1210,31 @@ html.walked-up .menu { z-index: 46; }
         "wallCm": null,
         "label9": {
           "land": {
-            "x": 0.62645,
-            "cy": 0.36802,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.864,
+            "x": 0.64466,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.852,
             "tint": [
               1.0,
-              0.999,
-              0.99
+              1.0,
+              0.993
             ],
-            "wallLum": 28.2,
+            "wallLum": 26.4,
             "where": "right"
           },
           "port": {
-            "x": 0.62645,
-            "cy": 0.36802,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.864,
+            "x": 0.64466,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.852,
             "tint": [
               1.0,
-              0.999,
-              0.99
+              1.0,
+              0.993
             ],
-            "wallLum": 28.2,
+            "wallLum": 26.4,
             "where": "right"
           }
         }
@@ -1225,22 +1243,22 @@ html.walked-up .menu { z-index: 46; }
         "id": "alien",
         "slug": "alien",
         "title": "Aliens",
-        "img": "img/g10/station-alien.jpg?v=0f6e3195",
-        "imgPortrait": "img/g10/station-alien.jpg?v=0f6e3195",
+        "img": "img/g10v2/station-alien.jpg?v=8b291ce6",
+        "imgPortrait": "img/g10v2/station-alien.jpg?v=8b291ce6",
         "floorY": 960,
         "floorYPortrait": 960,
         "yawDeg": 120,
         "art": [
-          0.2194,
-          0.6673,
-          0.2852,
-          0.6921
+          0.304,
+          0.4883,
+          0.4043,
+          0.5658
         ],
         "artPortrait": [
-          0.2194,
-          0.6673,
-          0.2852,
-          0.6921
+          0.304,
+          0.4883,
+          0.4043,
+          0.5658
         ],
         "look": {
           "views": [
@@ -1253,18 +1271,18 @@ html.walked-up .menu { z-index: 46; }
           ],
           "viewNames": null
         },
-        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz4jmnqKa1KhJOB1oAlAG01GBV2G03LmWQJ7AZP5VXkhKklCSB6ikMruOaEFI59aVGXI5piEY0IxU5HXFBSQ/wN+VKsMv/ADzagCaO4kRdqucdaaZ3kyGYnNPgsriYFlRQAcHcwFJLazwMAyA5/usDQMSPDW0q5GS6nGfrUB4kH1qxEjKjh1KsSMHH1prq20gZPPpSAuqqlwOtaSwR/ZZSse5whxz0rLRvnGa1beT/AEeUA9VpMaMFY74dN/8A31Rsu94LB+v96tmPbg8VBMVB4FFwsEwQn7m38agVFJ64qSd8sarhuaAP/9k=",
-        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz4jmnqKa1KhJOB1oAlAG01GBV2G03LmWQJ7AZP5VXkhKklCSB6ikMruOaEFI59aVGXI5piEY0IxU5HXFBSQ/wN+VKsMv/ADzagCaO4kRdqucdaaZ3kyGYnNPgsriYFlRQAcHcwFJLazwMAyA5/usDQMSPDW0q5GS6nGfrUB4kH1qxEjKjh1KsSMHH1prq20gZPPpSAuqqlwOtaSwR/ZZSse5whxz0rLRvnGa1beT/AEeUA9VpMaMFY74dN/8A31Rsu94LB+v96tmPbg8VBMVB4FFwsEwQn7m38agVFJ64qSd8sarhuaAP/9k=",
+        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz4jmnqKa1AagCYAYNRgU5CzHaqkn0ApmSDzSAa45oQUjGlRlyOaYCMaTNKUkP8DflQIZT/wAs2oAkt3kDYiOCaZKzb/n+8ODTWV48b1Iz0zSrHJINyKSOlAEsWGtZUyMl1OM49ahPEg+tTwxssbh1KsSMHH1pHVtpAyefSkMuqqlwOta1tBDtP7rccetY6N84zWrbyEQS4Pakxop6xZvN5XkxooXOfm+lNsIWgtissasd2c5qckuvXpUTsVGKACYIT9zH41AqKT1xUk75Y1XDc0Af/9k=",
+        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz4jmnqKa1AagCYAYNRgU5CzHaqkn0ApmSDzSAa45oQUjGlRlyOaYCMaTNKUkP8DflQIZT/wAs2oAkt3kDYiOCaZKzb/n+8ODTWV48b1Iz0zSrHJINyKSOlAEsWGtZUyMl1OM49ahPEg+tTwxssbh1KsSMHH1pHVtpAyefSkMuqqlwOta1tBDtP7rccetY6N84zWrbyEQS4Pakxop6xZvN5XkxooXOfm+lNsIWgtissasd2c5qckuvXpUTsVGKACYIT9zH41AqKT1xUk75Y1XDc0Af/9k=",
         "art9": {
           "land": {
             "src": "img/art/alien-landscape.webp?v=737abcf0",
             "w": 686,
             "h": 900,
             "rect": [
-              0.277344,
-              0.161458,
-              0.425043,
-              0.557637
+              0.400905,
+              0.279332,
+              0.175681,
+              0.230485
             ]
           },
           "port": {
@@ -1272,10 +1290,10 @@ html.walked-up .menu { z-index: 46; }
             "w": 686,
             "h": 900,
             "rect": [
-              0.277344,
-              0.161458,
-              0.425043,
-              0.557637
+              0.400905,
+              0.279332,
+              0.175681,
+              0.230485
             ]
           }
         },
@@ -1283,32 +1301,32 @@ html.walked-up .menu { z-index: 46; }
         "wallCm": null,
         "label9": {
           "land": {
-            "x": 0.52436,
-            "cy": 0.72399,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.796,
+            "x": 0.33757,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.804,
             "tint": [
               1.0,
-              0.982,
-              0.977
+              1.0,
+              0.995
             ],
-            "wallLum": 17.5,
-            "where": "plinth"
+            "wallLum": 18.8,
+            "where": "left"
           },
           "port": {
-            "x": 0.52436,
-            "cy": 0.72399,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.796,
+            "x": 0.33757,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.804,
             "tint": [
               1.0,
-              0.982,
-              0.977
+              1.0,
+              0.995
             ],
-            "wallLum": 17.5,
-            "where": "plinth"
+            "wallLum": 18.8,
+            "where": "left"
           }
         }
       },
@@ -1316,22 +1334,22 @@ html.walked-up .menu { z-index: 46; }
         "id": "portals",
         "slug": "portals",
         "title": "Portals of Love",
-        "img": "img/g10/station-portals.jpg?v=d54001f7",
-        "imgPortrait": "img/g10/station-portals.jpg?v=d54001f7",
+        "img": "img/g10v2/station-portals.jpg?v=dd0a5506",
+        "imgPortrait": "img/g10v2/station-portals.jpg?v=dd0a5506",
         "floorY": 960,
         "floorYPortrait": 960,
         "yawDeg": 160,
         "art": [
-          0.1803,
-          0.6003,
-          0.3939,
-          0.5964
+          0.2728,
+          0.5417,
+          0.4355,
+          0.5651
         ],
         "artPortrait": [
-          0.1803,
-          0.6003,
-          0.3939,
-          0.5964
+          0.2728,
+          0.5417,
+          0.4355,
+          0.5651
         ],
         "look": {
           "views": [
@@ -1344,18 +1362,18 @@ html.walked-up .menu { z-index: 46; }
           ],
           "viewNames": null
         },
-        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzUkQ5qNuCNwIzyMjrUkTDPBoA6XQ0GxifSs/VB+8arekZeAkEg5I7en/66j1lVWKIkDe3Uj6DrWSl71jVx925gOKEHNOekXrWpkSzYeKAgg7Y8HkcHJqCI4c1Y2/ukAyp24bjvTGSRmGAWpDNfR3AjfO3gn+VR6rMjxxgAbs54BGBimWMs9vFtMDFC2cggc4qK8M0oXMcmQf4mBqEveuXf3bFFjTQae0Uv9w00Ryf3G/KtDM05ETtmiNY88k02RqYrVJRuQxRGxjbPVyP5VHeQxC3EmOC2M023fFhGP9s029fNgo/2yf0qepXQzmCZ4zU8G30qpnmrELciqJP/2Q==",
-        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzUkQ5qNuCNwIzyMjrUkTDPBoA6XQ0GxifSs/VB+8arekZeAkEg5I7en/66j1lVWKIkDe3Uj6DrWSl71jVx925gOKEHNOekXrWpkSzYeKAgg7Y8HkcHJqCI4c1Y2/ukAyp24bjvTGSRmGAWpDNfR3AjfO3gn+VR6rMjxxgAbs54BGBimWMs9vFtMDFC2cggc4qK8M0oXMcmQf4mBqEveuXf3bFFjTQae0Uv9w00Ryf3G/KtDM05ETtmiNY88k02RqYrVJRuQxRGxjbPVyP5VHeQxC3EmOC2M023fFhGP9s029fNgo/2yf0qepXQzmCZ4zU8G30qpnmrELciqJP/2Q==",
+        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzUkQ5qNuCNwIzyMjrUkTDPBoA6XQ0GxifSs/VF/eNS2E0pJSLrjNRX+9XAkxlhuFR1L6GW4oQc056RetWQSzYeKAgg7Y8HkcHJqCI4c1Y2/ukAyp24bjvTGSRmGAWpDNDSHIuuOm3n86bqsu+5B5yEAOarwx3UZ3xqy+4xSTR3DHMiHP4VNveuVf3bFdjTQae0Uv8AcNNEcn9xvyqyDTkRO2aI1jzyTTZGpitUlG5DFCbGNvVyP5VHeQxC3EuOC2M023fFhGP9s029fNgo/wBs/wAqnqV0M5gmeM1PBt9KqZ5qxC3IqiT/2Q==",
+        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzUkQ5qNuCNwIzyMjrUkTDPBoA6XQ0GxifSs/VF/eNS2E0pJSLrjNRX+9XAkxlhuFR1L6GW4oQc056RetWQSzYeKAgg7Y8HkcHJqCI4c1Y2/ukAyp24bjvTGSRmGAWpDNDSHIuuOm3n86bqsu+5B5yEAOarwx3UZ3xqy+4xSTR3DHMiHP4VNveuVf3bFdjTQae0Uv8AcNNEcn9xvyqyDTkRO2aI1jzyTTZGpitUlG5DFCbGNvVyP5VHeQxC3EuOC2M023fFhGP9s029fNgo/wBs/wAqnqV0M5gmeM1PBt9KqZ5qxC3IqiT/2Q==",
         "art9": {
           "land": {
             "src": "img/art/portals-landscape.webp?v=4a3a24a2",
             "w": 508,
             "h": 1000,
             "rect": [
-              0.380208,
-              0.173177,
-              0.22311,
-              0.439193
+              0.426461,
+              0.267914,
+              0.142859,
+              0.281218
             ]
           },
           "port": {
@@ -1363,10 +1381,10 @@ html.walked-up .menu { z-index: 46; }
             "w": 508,
             "h": 1000,
             "rect": [
-              0.380208,
-              0.173177,
-              0.22311,
-              0.439193
+              0.426461,
+              0.267914,
+              0.142859,
+              0.281218
             ]
           }
         },
@@ -1374,31 +1392,31 @@ html.walked-up .menu { z-index: 46; }
         "wallCm": null,
         "label9": {
           "land": {
-            "x": 0.61215,
-            "cy": 0.3567,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.896,
+            "x": 0.61634,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.877,
             "tint": [
               1.0,
-              0.994,
-              0.985
+              0.998,
+              0.991
             ],
-            "wallLum": 33.4,
+            "wallLum": 30.4,
             "where": "right"
           },
           "port": {
-            "x": 0.61215,
-            "cy": 0.3567,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.896,
+            "x": 0.61634,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.877,
             "tint": [
               1.0,
-              0.994,
-              0.985
+              0.998,
+              0.991
             ],
-            "wallLum": 33.4,
+            "wallLum": 30.4,
             "where": "right"
           }
         }
@@ -1407,22 +1425,22 @@ html.walked-up .menu { z-index: 46; }
         "id": "yoyo-gown",
         "slug": "yoyo-gown",
         "title": "She gazed at the carousel through rose-colored glasses",
-        "img": "img/g10/station-yoyo-gown.jpg?v=f000d51a",
-        "imgPortrait": "img/g10/station-yoyo-gown.jpg?v=f000d51a",
+        "img": "img/g10v2/station-yoyo-gown.jpg?v=1fb7a2d6",
+        "imgPortrait": "img/g10v2/station-yoyo-gown.jpg?v=1fb7a2d6",
         "floorY": 960,
         "floorYPortrait": 960,
         "yawDeg": 200,
         "art": [
-          0.2943,
-          0.7852,
-          0.3118,
-          0.6029
+          0.3496,
+          0.7767,
+          0.3275,
+          0.5801
         ],
         "artPortrait": [
-          0.2943,
-          0.7852,
-          0.3118,
-          0.6029
+          0.3496,
+          0.7767,
+          0.3275,
+          0.5801
         ],
         "look": {
           "views": [
@@ -1435,18 +1453,18 @@ html.walked-up .menu { z-index: 46; }
           ],
           "viewNames": null
         },
-        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzT4hzSNTo+DQBs6co2Nn0qldD5jVi2837M8qL8iEBjnpnp/Kqk8gY9eaQ+hTcUyMfNUj0yMjdTEOJpVbBB9CKQxyH+BvypwgmYYEZoA64sQVRbeJg65LEkEVja0QvlKB1JNaqOySKmQS4AGDmsnXIZjcxKqEgKenY1C3NZbGasgS3uATgsgA/Oo4in2YHI8zf09sVNHEV3+bGScfLn1okYNAVCDdkYwKozLYAB6k1cgICkYzVBW5q3C+M/SkxmnvhuGRkVkcc4xxxUNzMr3HmbMcY+tNs5AJVz0qvM/NId9BszK3YVVWFGbJxT3bmmBuaYj//Z",
-        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzT4hzSNTo+DQBs6co2Nn0qldD5jVi2837M8qL8iEBjnpnp/Kqk8gY9eaQ+hTcUyMfNUj0yMjdTEOJpVbBB9CKQxyH+BvypwgmYYEZoA64sQVRbeJg65LEkEVja0QvlKB1JNaqOySKmQS4AGDmsnXIZjcxKqEgKenY1C3NZbGasgS3uATgsgA/Oo4in2YHI8zf09sVNHEV3+bGScfLn1okYNAVCDdkYwKozLYAB6k1cgICkYzVBW5q3C+M/SkxmnvhuGRkVkcc4xxxUNzMr3HmbMcY+tNs5AJVz0qvM/NId9BszK3YVVWFGbJxT3bmmBuaYj//Z",
+        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzT4xzSNTozg0AbOnKNjZ9KpXQ5NSQTFUwDUE8gYnnmkPoU3FMjHzVI9MjI3UxDiaM4U0GOQ/wN+VL5EzKcRsaAOkisrNbXy8SZmAYfLnp79u+ax9SgjtrhEjzypJya3bdnVIo2GWMYAHvWNrEM7agMRsQEAzULc0ktCksgS3uATgsgA/Oo4in2YHI8zf09sVNHEV3+bGScfLn1okYNAVCDdkYwKogt4APUmrcP3CAO1UVbmrcD4z9KTGaUbxymMrGyOmOnTioJpFa4aQoBntRZyASrnpVeZ+aQ76DZmVuwqqsKM2Tinu3NMDc0xH//2Q==",
+        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzT4xzSNTozg0AbOnKNjZ9KpXQ5NSQTFUwDUE8gYnnmkPoU3FMjHzVI9MjI3UxDiaM4U0GOQ/wN+VL5EzKcRsaAOkisrNbXy8SZmAYfLnp79u+ax9SgjtrhEjzypJya3bdnVIo2GWMYAHvWNrEM7agMRsQEAzULc0ktCksgS3uATgsgA/Oo4in2YHI8zf09sVNHEV3+bGScfLn1okYNAVCDdkYwKogt4APUmrcP3CAO1UVbmrcD4z9KTGaUbxymMrGyOmOnTioJpFa4aQoBntRZyASrnpVeZ+aQ76DZmVuwqqsKM2Tinu3NMDc0xH//2Q==",
         "art9": {
           "land": {
             "src": "img/art/yoyo-gown-landscape.webp?v=e283881f",
             "w": 686,
             "h": 900,
             "rect": [
-              0.246745,
-              0.27474,
-              0.396336,
-              0.519974
+              0.270629,
+              0.332778,
+              0.344343,
+              0.451761
             ]
           },
           "port": {
@@ -1454,10 +1472,10 @@ html.walked-up .menu { z-index: 46; }
             "w": 686,
             "h": 900,
             "rect": [
-              0.246745,
-              0.27474,
-              0.396336,
-              0.519974
+              0.270629,
+              0.332778,
+              0.344343,
+              0.451761
             ]
           }
         },
@@ -1465,31 +1483,31 @@ html.walked-up .menu { z-index: 46; }
         "wallCm": 198.1,
         "label9": {
           "land": {
-            "x": 0.63439,
-            "cy": 0.50048,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.838,
+            "x": 0.63145,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.865,
             "tint": [
               1.0,
-              1.0,
-              0.995
+              0.999,
+              0.992
             ],
-            "wallLum": 24.2,
+            "wallLum": 28.4,
             "where": "right"
           },
           "port": {
-            "x": 0.63439,
-            "cy": 0.50048,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.838,
+            "x": 0.63145,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.865,
             "tint": [
               1.0,
-              1.0,
-              0.995
+              0.999,
+              0.992
             ],
-            "wallLum": 24.2,
+            "wallLum": 28.4,
             "where": "right"
           }
         }
@@ -1498,22 +1516,22 @@ html.walked-up .menu { z-index: 46; }
         "id": "aliens2",
         "slug": "aliens2",
         "title": "Aliens",
-        "img": "img/g10/station-aliens2.jpg?v=b33f5142",
-        "imgPortrait": "img/g10/station-aliens2.jpg?v=b33f5142",
+        "img": "img/g10v2/station-aliens2.jpg?v=3562e2b4",
+        "imgPortrait": "img/g10v2/station-aliens2.jpg?v=3562e2b4",
         "floorY": 960,
         "floorYPortrait": 960,
         "yawDeg": 240,
         "art": [
-          0.2318,
-          0.5781,
-          0.4245,
-          0.5716
+          0.3092,
+          0.4902,
+          0.4616,
+          0.5378
         ],
         "artPortrait": [
-          0.2318,
-          0.5781,
-          0.4245,
-          0.5716
+          0.3092,
+          0.4902,
+          0.4616,
+          0.5378
         ],
         "look": {
           "views": [
@@ -1542,18 +1560,18 @@ html.walked-up .menu { z-index: 46; }
             "Group"
           ]
         },
-        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzxxT7cfMKbJwMkEA9DipLcjcMUAdBpqZFV9UTGalsJSCFBAJ9TiodRfLMrEEj0ORSGYMo5p8Y4olHNCHimIfcyqbSBB1VmyKUFAU2HPyDP1qRVVYVJj+fJzkU2bMjIUQcDBxSGWreQl1AG456etJdOd7Ky7SCePSoEimPRP1FNeOYdUx+IoEQSHmhTSOj/wB005YpMf6tvypga0wUg4FJBHEHG7FNdqRG5qSjYsI7WW5CMvBYCo9Tjt45nWNQAGI6VDpj4uk/3xSao+Z3/wB+p6ldDPkCbuKuW8cZQZJFZ7NzVuJvlFUSf//Z",
-        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzxxT7cfMKbJwMkEA9DipLcjcMUAdBpqZFV9UTGalsJSCFBAJ9TiodRfLMrEEj0ORSGYMo5p8Y4olHNCHimIfcyqbSBB1VmyKUFAU2HPyDP1qRVVYVJj+fJzkU2bMjIUQcDBxSGWreQl1AG456etJdOd7Ky7SCePSoEimPRP1FNeOYdUx+IoEQSHmhTSOj/wB005YpMf6tvypga0wUg4FJBHEHG7FNdqRG5qSjYsI7WW5CMvBYCo9Tjt45nWNQAGI6VDpj4uk/3xSao+Z3/wB+p6ldDPkCbuKuW8cZQZJFZ7NzVuJvlFUSf//Z",
+        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzxxT7cfMKbJwMkEA9DipLcjcMUAdBpqZFV9UTBNPs59gqK/l35pAYUo5p8Y4olHNCHimA+5lU2kCDqrNkUoKApsOfkGfrUiqqwqTH8+TnIps2ZGQog4GDikMswzbSDnFNuJdzE5znvUSRTnon6imvHMOqfqKBEEh5oU0jo/8AdNOWKTH+rb8qYGtMFIOBSQRxBxuxTXakRuako2LBLaS5CkcFgKj1RII53CLwGI6VDpj4uk/3xSao+Z3/AN+p6ldDPkCbuKuW8cZQZJFZ7NzVuJvlFUSf/9k=",
+        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzxxT7cfMKbJwMkEA9DipLcjcMUAdBpqZFV9UTBNPs59gqK/l35pAYUo5p8Y4olHNCHimA+5lU2kCDqrNkUoKApsOfkGfrUiqqwqTH8+TnIps2ZGQog4GDikMswzbSDnFNuJdzE5znvUSRTnon6imvHMOqfqKBEEh5oU0jo/8AdNOWKTH+rb8qYGtMFIOBSQRxBxuxTXakRuako2LBLaS5CkcFgKj1RII53CLwGI6VDpj4uk/3xSao+Z3/AN+p6ldDPkCbuKuW8cZQZJFZ7NzVuJvlFUSf/9k=",
         "art9": {
           "land": {
             "src": "img/art/aliens2-landscape.webp?v=7f6a5f7e",
             "w": 981,
             "h": 1000,
             "rect": [
-              0.236979,
-              0.215495,
-              0.379435,
-              0.386784
+              0.363282,
+              0.300753,
+              0.198697,
+              0.202546
             ]
           },
           "port": {
@@ -1561,10 +1579,10 @@ html.walked-up .menu { z-index: 46; }
             "w": 981,
             "h": 1000,
             "rect": [
-              0.236979,
-              0.215495,
-              0.379435,
-              0.386784
+              0.363282,
+              0.300753,
+              0.198697,
+              0.202546
             ]
           }
         },
@@ -1572,31 +1590,31 @@ html.walked-up .menu { z-index: 46; }
         "wallCm": null,
         "label9": {
           "land": {
-            "x": 0.58735,
-            "cy": 0.37725,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.956,
+            "x": 0.58971,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.932,
             "tint": [
               1.0,
-              0.997,
-              0.984
+              0.999,
+              0.985
             ],
-            "wallLum": 42.8,
+            "wallLum": 38.9,
             "where": "right"
           },
           "port": {
-            "x": 0.58735,
-            "cy": 0.37725,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.956,
+            "x": 0.58971,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.932,
             "tint": [
               1.0,
-              0.997,
-              0.984
+              0.999,
+              0.985
             ],
-            "wallLum": 42.8,
+            "wallLum": 38.9,
             "where": "right"
           }
         }
@@ -1605,22 +1623,22 @@ html.walked-up .menu { z-index: 46; }
         "id": "st-lucia",
         "slug": "st-lucia",
         "title": "St. Lucia Eyes",
-        "img": "img/g10/station-st-lucia.jpg?v=8cb7ec4e",
-        "imgPortrait": "img/g10/station-st-lucia.jpg?v=8cb7ec4e",
+        "img": "img/g10v2/station-st-lucia.jpg?v=5aebcd51",
+        "imgPortrait": "img/g10v2/station-st-lucia.jpg?v=5aebcd51",
         "floorY": 960,
         "floorYPortrait": 960,
         "yawDeg": 280,
         "art": [
-          0.2233,
-          0.5326,
-          0.4121,
-          0.5788
+          0.2786,
+          0.6595,
+          0.3939,
+          0.599
         ],
         "artPortrait": [
-          0.2233,
-          0.5326,
-          0.4121,
-          0.5788
+          0.2786,
+          0.6595,
+          0.3939,
+          0.599
         ],
         "look": {
           "views": [
@@ -1642,26 +1660,26 @@ html.walked-up .menu { z-index: 46; }
             "Back"
           ]
         },
-        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzkj5qmQdKjb71SIaANS1XMDVFdLiNaLHEswjkkaOPBLsoyQB7VJqcccLL5ErPE2du4YIx2qepXQzHFIo5pXPemqy561RIxjzT1NM2uTwp/Kpkt5j0jagC5ptyIJCMYL4Bb0Uc/wA8flTtRn8xYxyWyzEnvnH+FUCXicoygEdQQKUNJM4QDcewApDJUwbC5z13J/M1XcKGG2rCWxCSGZXB4wo6GiVIjF+7iIcH3oAmVE8wVpRCEY3An8ay1P7wVcV6QzP1KN3v5mijfYTxge1LpiMl+hmibZg5yPatQLuBNI6hcGi4WFmERPyrioUjQmh2qMP70Af/2Q==",
-        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzkj5qmQdKjb71SIaANS1XMDVFdLiNaLHEswjkkaOPBLsoyQB7VJqcccLL5ErPE2du4YIx2qepXQzHFIo5pXPemqy561RIxjzT1NM2uTwp/Kpkt5j0jagC5ptyIJCMYL4Bb0Uc/wA8flTtRn8xYxyWyzEnvnH+FUCXicoygEdQQKUNJM4QDcewApDJUwbC5z13J/M1XcKGG2rCWxCSGZXB4wo6GiVIjF+7iIcH3oAmVE8wVpRCEY3An8ay1P7wVcV6QzP1KN3v5mijfYTxge1LpiMl+hmibZg5yPatQLuBNI6hcGi4WFmERPyrioUjQmh2qMP70Af/2Q==",
+        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzkj5qmQdKjb71SIaANS1XMDVFdLiNaZbefO6w26O7twFUZJp99Bc2j+VdRsjdsjg/Sp6jKDikUc0rnvTVZc9aoQxjzT1NM2uTwp/Kpkt5j0jagDS0iM4lmMpjyPLUjqSSCcfQfzFS6oxezBMjOqyjYX6nIOf5CqdslzAwco+2PJAB9etPuhPLCqKpIzkjilYfQrJg2FznruT+Zqu4UMNtWEtiEkMyuDxhR0NEqRGL93EQ4PvQBMqJ5grSiEIxuBP41lqf3gq4r0hlPUFka/laFH2ZGMfSl05XW+UzxuUwc5+la0QUoWI5NNnCKAw60XHYjmERPyrioUjQmh2qMP70CP/Z",
+        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzkj5qmQdKjb71SIaANS1XMDVFdLiNaZbefO6w26O7twFUZJp99Bc2j+VdRsjdsjg/Sp6jKDikUc0rnvTVZc9aoQxjzT1NM2uTwp/Kpkt5j0jagDS0iM4lmMpjyPLUjqSSCcfQfzFS6oxezBMjOqyjYX6nIOf5CqdslzAwco+2PJAB9etPuhPLCqKpIzkjilYfQrJg2FznruT+Zqu4UMNtWEtiEkMyuDxhR0NEqRGL93EQ4PvQBMqJ5grSiEIxuBP41lqf3gq4r0hlPUFka/laFH2ZGMfSl05XW+UzxuUwc5+la0QUoWI5NNnCKAw60XHYjmERPyrioUjQmh2qMP70CP/Z",
         "art9": {
           "land": {
             "src": "img/art/st-lucia-landscape.webp?v=3d062b77",
             "w": 686,
             "h": 900,
             "rect": [
-              0.376302,
-              0.214844,
-              0.245638,
-              0.322266
+              0.350168,
+              0.268664,
+              0.301996,
+              0.396204
             ],
             "occ": {
-              "src": "img/g10/art/st-lucia-occluder.webp?v=c03952f1",
+              "src": "img/g10v2/art/st-lucia-occluder.webp?v=7092891f",
               "rect": [
-                0.367839,
-                0.529297,
-                0.255859,
-                0.283854
+                0.370443,
+                0.647135,
+                0.250651,
+                0.159505
               ]
             }
           },
@@ -1670,18 +1688,18 @@ html.walked-up .menu { z-index: 46; }
             "w": 686,
             "h": 900,
             "rect": [
-              0.376302,
-              0.214844,
-              0.245638,
-              0.322266
+              0.350168,
+              0.268664,
+              0.301996,
+              0.396204
             ],
             "occ": {
-              "src": "img/g10/art/st-lucia-occluder.webp?v=c03952f1",
+              "src": "img/g10v2/art/st-lucia-occluder.webp?v=7092891f",
               "rect": [
-                0.367839,
-                0.529297,
-                0.255859,
-                0.283854
+                0.370443,
+                0.647135,
+                0.250651,
+                0.159505
               ]
             }
           }
@@ -1690,32 +1708,32 @@ html.walked-up .menu { z-index: 46; }
         "wallCm": null,
         "label9": {
           "land": {
-            "x": 0.59455,
-            "cy": 0.35321,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.861,
+            "x": 0.32715,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.836,
             "tint": [
               1.0,
-              0.999,
-              0.99
+              0.998,
+              0.985
             ],
-            "wallLum": 27.7,
-            "where": "right"
+            "wallLum": 23.9,
+            "where": "left"
           },
           "port": {
-            "x": 0.59455,
-            "cy": 0.35321,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.861,
+            "x": 0.32715,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.836,
             "tint": [
               1.0,
-              0.999,
-              0.99
+              0.998,
+              0.985
             ],
-            "wallLum": 27.7,
-            "where": "right"
+            "wallLum": 23.9,
+            "where": "left"
           }
         }
       },
@@ -1723,22 +1741,22 @@ html.walked-up .menu { z-index: 46; }
         "id": "assemblage",
         "slug": "assemblage",
         "title": "Assemblage",
-        "img": "img/g10/station-assemblage.jpg?v=a071c88b",
-        "imgPortrait": "img/g10/station-assemblage.jpg?v=a071c88b",
+        "img": "img/g10v2/station-assemblage.jpg?v=2303036e",
+        "imgPortrait": "img/g10v2/station-assemblage.jpg?v=2303036e",
         "floorY": 960,
         "floorYPortrait": 960,
         "yawDeg": 320,
         "art": [
-          0.3073,
-          0.4668,
-          0.3919,
-          0.6094
+          0.3522,
+          0.4674,
+          0.4245,
+          0.582
         ],
         "artPortrait": [
-          0.3073,
-          0.4668,
-          0.3919,
-          0.6094
+          0.3522,
+          0.4674,
+          0.4245,
+          0.582
         ],
         "look": {
           "views": [
@@ -1751,18 +1769,18 @@ html.walked-up .menu { z-index: 46; }
           ],
           "viewNames": null
         },
-        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzT4xzTWOMZyM9MjrToyCeDmgDUtF/d1FdL8gotjK/yxI7n0VSTTLgyKSkqMjD+Fhgip6jKbimAU96RRVCJ7jaYbPP/ADzIP51WXAkOKsiFFjiLhnOCSpzheaSWINIDBEQMc0hklrO0UgKymPucEjNJdTmWTLSeYT3yTVaVXjYB1KkjNEatI5CLkgZosF3awMaRTTmik/uGhYZf+ebflTEa8qJk4JpYVjB5qJ2piv8ANUlEmsWU0ssMkEYKGPrkdcmmaVayQzSvOg2+Xjr3yK2MGW2i9lqu6+XC5x1FSn0Kt1KcwjJ4pzt5OwKMgqDVZ2p8zcp/uiqJP//Z",
-        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzT4xzTWOMZyM9MjrToyCeDmgDUtF/d1FdL8gotjK/yxI7n0VSTTLgyKSkqMjD+Fhgip6jKbimAU96RRVCJ7jaYbPP/ADzIP51WXAkOKsiFFjiLhnOCSpzheaSWINIDBEQMc0hklrO0UgKymPucEjNJdTmWTLSeYT3yTVaVXjYB1KkjNEatI5CLkgZosF3awMaRTTmik/uGhYZf+ebflTEa8qJk4JpYVjB5qJ2piv8ANUlEmsWU0ssMkEYKGPrkdcmmaVayQzSvOg2+Xjr3yK2MGW2i9lqu6+XC5x1FSn0Kt1KcwjJ4pzt5OwKMgqDVZ2p8zcp/uiqJP//Z",
+        "ph": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzT4xzTWOMZyM9MjrToyCeDmgDUtF/d1FdL8gpkcpVcA02WQsKmwyq4pgFPekUVQie42mGzz/zzIP51WXAkOKsiFFjiLhnOCSpzheaSWINIDBEQMc0hjreYRyhiEPs4yKLmVZJmZQgB7IMD8qryq8bAOpUkZojVpHIRckDNAX6AxpFNOaKT+4aFhl/55t+VMRryomTgmlhWMHmonamK/wA1SUSaxZTSywyQRgoY+uR1yaZpVrJDNK86Db5eOvfIrYwZbaL2Wq7r5cLnHUVKfQq3UpzCMninO3k7AoyCoNVnanzNyn+6Kok//9k=",
+        "phPortrait": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAwADADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDz1hzT4xzTWOMZyM9MjrToyCeDmgDUtF/d1FdL8gpkcpVcA02WQsKmwyq4pgFPekUVQie42mGzz/zzIP51WXAkOKsiFFjiLhnOCSpzheaSWINIDBEQMc0hjreYRyhiEPs4yKLmVZJmZQgB7IMD8qryq8bAOpUkZojVpHIRckDNAX6AxpFNOaKT+4aFhl/55t+VMRryomTgmlhWMHmonamK/wA1SUSaxZTSywyQRgoY+uR1yaZpVrJDNK86Db5eOvfIrYwZbaL2Wq7r5cLnHUVKfQq3UpzCMninO3k7AoyCoNVnanzNyn+6Kok//9k=",
         "art9": {
           "land": {
             "src": "img/art/assemblage-landscape.webp?v=9af95925",
             "w": 1304,
             "h": 1000,
             "rect": [
-              0.369792,
-              0.289714,
-              0.256301,
-              0.196549
+              0.408408,
+              0.339166,
+              0.186344,
+              0.142902
             ]
           },
           "port": {
@@ -1770,10 +1788,10 @@ html.walked-up .menu { z-index: 46; }
             "w": 1304,
             "h": 1000,
             "rect": [
-              0.369792,
-              0.289714,
-              0.256301,
-              0.196549
+              0.408408,
+              0.339166,
+              0.186344,
+              0.142902
             ]
           }
         },
@@ -1781,31 +1799,31 @@ html.walked-up .menu { z-index: 46; }
         "wallCm": null,
         "label9": {
           "land": {
-            "x": 0.62515,
-            "cy": 0.37429,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.873,
+            "x": 0.63398,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.863,
             "tint": [
               1.0,
-              0.991,
-              0.977
+              0.993,
+              0.978
             ],
-            "wallLum": 29.7,
+            "wallLum": 28.1,
             "where": "right"
           },
           "port": {
-            "x": 0.62515,
-            "cy": 0.37429,
-            "w": 0.02625,
-            "h": 0.03149,
-            "bright": 0.873,
+            "x": 0.63398,
+            "cy": 0.41426,
+            "w": 0.01452,
+            "h": 0.01745,
+            "bright": 0.863,
             "tint": [
               1.0,
-              0.991,
-              0.977
+              0.993,
+              0.978
             ],
-            "wallLum": 29.7,
+            "wallLum": 28.1,
             "where": "right"
           }
         }
@@ -1822,11 +1840,11 @@ html.walked-up .menu { z-index: 46; }
         "floorY": 641,
         "layout": "archive",
         "door": {
-          "img": "img/g10/door-exhibitions.jpg?v=8d787654",
-          "imgPortrait": "img/g10/door-exhibitions.jpg?v=8d787654",
-          "wall": "img/g10/door/door-exhibitions-wall.webp?v=5d4ab819",
-          "wallPortrait": "img/g10/door/door-exhibitions-wall.webp?v=5d4ab819",
-          "roomExt": "img/g10/door/room-exhibitions-ext.jpg?v=830f91b8",
+          "img": "img/g10v2/door-exhibitions.jpg?v=90427ceb",
+          "imgPortrait": "img/g10v2/door-exhibitions.jpg?v=90427ceb",
+          "wall": "img/g10v2/door/door-exhibitions-wall.webp?v=b4b77b57",
+          "wallPortrait": "img/g10v2/door/door-exhibitions-wall.webp?v=b4b77b57",
+          "roomExt": "img/g10v2/door/room-exhibitions-ext.jpg?v=830f91b8",
           "roomExtSize": [
             1536,
             2303
@@ -1874,11 +1892,11 @@ html.walked-up .menu { z-index: 46; }
         "floorY": 664,
         "layout": "studio",
         "door": {
-          "img": "img/g10/door-studio.jpg?v=05acb679",
-          "imgPortrait": "img/g10/door-studio.jpg?v=05acb679",
-          "wall": "img/g10/door/door-studio-wall.webp?v=1cbce005",
-          "wallPortrait": "img/g10/door/door-studio-wall.webp?v=1cbce005",
-          "roomExt": "img/g10/door/room-studio-ext.jpg?v=f912b9e3",
+          "img": "img/g10v2/door-studio.jpg?v=00c48757",
+          "imgPortrait": "img/g10v2/door-studio.jpg?v=00c48757",
+          "wall": "img/g10v2/door/door-studio-wall.webp?v=ff97768d",
+          "wallPortrait": "img/g10v2/door/door-studio-wall.webp?v=ff97768d",
+          "roomExt": "img/g10v2/door/room-studio-ext.jpg?v=f912b9e3",
           "roomExtSize": [
             1536,
             2303
@@ -1928,11 +1946,11 @@ html.walked-up .menu { z-index: 46; }
         "floorY": 662,
         "layout": "wardrobe",
         "door": {
-          "img": "img/g10/door-wardrobe.jpg?v=0376d5e2",
-          "imgPortrait": "img/g10/door-wardrobe.jpg?v=0376d5e2",
-          "wall": "img/g10/door/door-wardrobe-wall.webp?v=ce38d044",
-          "wallPortrait": "img/g10/door/door-wardrobe-wall.webp?v=ce38d044",
-          "roomExt": "img/g10/door/room-wardrobe-ext.jpg?v=29654fa2",
+          "img": "img/g10v2/door-wardrobe.jpg?v=484c9ee6",
+          "imgPortrait": "img/g10v2/door-wardrobe.jpg?v=484c9ee6",
+          "wall": "img/g10v2/door/door-wardrobe-wall.webp?v=90a7051f",
+          "wallPortrait": "img/g10v2/door/door-wardrobe-wall.webp?v=90a7051f",
+          "roomExt": "img/g10v2/door/room-wardrobe-ext.jpg?v=29654fa2",
           "roomExtSize": [
             1536,
             2303
@@ -1980,11 +1998,11 @@ html.walked-up .menu { z-index: 46; }
         "floorY": 718,
         "layout": "entrance",
         "door": {
-          "img": "img/g10/door-entrance.jpg?v=6859882c",
-          "imgPortrait": "img/g10/door-entrance.jpg?v=6859882c",
-          "wall": "img/g10/door/door-entrance-wall.webp?v=7def124b",
-          "wallPortrait": "img/g10/door/door-entrance-wall.webp?v=7def124b",
-          "roomExt": "img/g10/door/room-entrance-ext.jpg?v=4eeb5b78",
+          "img": "img/g10v2/door-entrance.jpg?v=0d7e2946",
+          "imgPortrait": "img/g10v2/door-entrance.jpg?v=0d7e2946",
+          "wall": "img/g10v2/door/door-entrance-wall.webp?v=793534e1",
+          "wallPortrait": "img/g10v2/door/door-entrance-wall.webp?v=793534e1",
+          "roomExt": "img/g10v2/door/room-entrance-ext.jpg?v=4eeb5b78",
           "roomExtSize": [
             1536,
             2303
@@ -2032,11 +2050,11 @@ html.walked-up .menu { z-index: 46; }
         "floorY": 718,
         "layout": "entrance",
         "door": {
-          "img": "img/g10/door-entrance.jpg?v=6859882c",
-          "imgPortrait": "img/g10/door-entrance.jpg?v=6859882c",
-          "wall": "img/g10/door/door-entrance-wall.webp?v=7def124b",
-          "wallPortrait": "img/g10/door/door-entrance-wall.webp?v=7def124b",
-          "roomExt": "img/g10/door/room-entrance-ext.jpg?v=4eeb5b78",
+          "img": "img/g10v2/door-entrance.jpg?v=0d7e2946",
+          "imgPortrait": "img/g10v2/door-entrance.jpg?v=0d7e2946",
+          "wall": "img/g10v2/door/door-entrance-wall.webp?v=793534e1",
+          "wallPortrait": "img/g10v2/door/door-entrance-wall.webp?v=793534e1",
+          "roomExt": "img/g10v2/door/room-entrance-ext.jpg?v=4eeb5b78",
           "roomExtSize": [
             1536,
             2303
@@ -4211,8 +4229,27 @@ html.walked-up .menu { z-index: 46; }
       c4: (-30 * D + 16 * v0 * T + 3 * a0 * T2) / (2 * T3 * T),
       c5: (12 * D - 6 * v0 * T - a0 * T2) / (2 * T3 * T2) };
   }
+  // A long comfortable turn (round 10.1): speed rises on a minimum-jerk curve over Ta seconds to vmax, cruises, and falls
+  // the same way; peak speed vmax, peak acceleration 1.875 vmax / Ta. Distance covered while ramping: vmax Ta / 2 each.
+  function cruiseSeg(p0, p1, vmax, Ta, t0) {
+    var D = Math.abs(p1 - p0), dir = p1 >= p0 ? 1 : -1;
+    if (D < vmax * Ta) { vmax = D / Ta; }
+    var Tc = (D - vmax * Ta) / vmax;
+    return { cruise: true, p0: p0, p1: p1, dir: dir, vmax: vmax, Ta: Ta, Tc: Tc, T: 2 * Ta + Tc, t0: t0 };
+  }
+  function cruiseEval(s, t) {
+    var r = function (x) { return 2.5 * x * x * x * x - 3 * x * x * x * x * x + x * x * x * x * x * x; };     // integral of the ramp
+    var sm = function (x) { return 10 * x * x * x - 15 * x * x * x * x + 6 * x * x * x * x * x; };
+    var acc = function (x) { return (30 * x * x - 60 * x * x * x + 30 * x * x * x * x); };
+    var V = s.vmax, A = s.Ta, d, v, a;
+    if (t < A) { var x = t / A; d = V * A * r(x); v = V * sm(x); a = V / A * acc(x); }
+    else if (t < A + s.Tc) { d = V * A / 2 + V * (t - A); v = V; a = 0; }
+    else { var y = (s.T - t) / A; d = Math.abs(s.p1 - s.p0) - V * A * r(y); v = V * sm(y); a = -V / A * acc(y); }
+    return [s.p0 + s.dir * d, s.dir * v, s.dir * a];
+  }
   function qeval(s, tm) {
     var t = (tm - s.t0) / 1000;
+    if (s.cruise) { if (t <= 0) return [s.p0, 0, 0]; if (t >= s.T) return [s.p1, 0, 0]; return cruiseEval(s, t); }
     if (t <= 0) return [s.p0, t < 0 ? 0 : s.v0, t < 0 ? 0 : s.a0];
     if (t >= s.T) return [s.p1, 0, 0];
     var t2 = t * t, t3 = t2 * t, t4 = t3 * t, t5 = t4 * t;
@@ -4543,22 +4580,22 @@ html.walked-up .menu { z-index: 46; }
     // (plus 45% of the frame, so a face turned away still covers the top edge), and only that off-screen part fades. The picture itself is opaque.
     // Round 10 (Astra test 6): the wide frames reach past the top of the screen, so the stretched top strip is gone; it
     // returns only for a frame that starts below the top of the screen (none of the rebuilt frames do).
-    var top0 = G.H / 2 + g.ty - g.hp / 2, Fd = top0 > 0 ? Math.round(g.hp * 0.45) : 0, T = Math.max(0, Math.ceil(top0)) + Fd;
+    var T = 0;                                                    // no stretched top strip at all (Astra test 6, R10 note)
     f.top = T;
     f.plane.style.height = (T + g.hp + B).toFixed(2) + 'px';
     f.plane.style.marginTop = (-g.hp / 2 - T).toFixed(2) + 'px';
     f.plane.style.transform = 'translateY(' + g.ty.toFixed(2) + 'px)';
-    f.plane.style.setProperty('--mt', Math.round(Fd * 0.35) + 'px');   // only the far end fades, well off screen
+    if (f.wlFace) {
+      f.wlFace.style.width = f.el.style.width || (g.wp.toFixed(2) + 'px'); f.wlFace.style.left = ((G.W - g.wp) / 2).toFixed(2) + 'px';
+      f.wlPlane.style.height = f.plane.style.height; f.wlPlane.style.marginTop = f.plane.style.marginTop; f.wlPlane.style.transform = f.plane.style.transform;
+    }
+    f.plane.style.setProperty('--mt', '0px');                     // no top fade: the frame itself reaches past the top of the screen
     f.plane.style.setProperty('--mb', (g.hp * 0.1).toFixed(1) + 'px');
     f.img.style.left = g.ext.toFixed(2) + 'px';
     f.img.style.width = (g.wp - 2 * g.ext).toFixed(2) + 'px';
     f.img.style.height = g.hp.toFixed(2) + 'px';
     f.img.style.top = T + 'px';
-    f.st.style.display = T > 0 ? '' : 'none';
-    f.st.style.left = '0px'; f.st.style.width = g.wp.toFixed(2) + 'px';
-    f.st.style.top = '0px'; f.st.style.height = (T + 0.5).toFixed(2) + 'px';
-    // Stretched from the frame's top 1.5% of rows (wall only), never a mirror that could reach the art.
-    f.st.style.backgroundSize = (g.wp - 2 * g.ext).toFixed(2) + 'px ' + ((T + 0.5) / 0.015).toFixed(1) + 'px';
+    f.st.style.display = 'none';
     f.sb.style.left = g.ext.toFixed(2) + 'px';
     f.sb.style.width = (g.wp - 2 * g.ext).toFixed(2) + 'px';
     f.sb.style.top = (T + g.hp - 0.5).toFixed(2) + 'px';
@@ -4587,7 +4624,12 @@ html.walked-up .menu { z-index: 46; }
     if (L.award) paper.appendChild(el('p', 'wl-a', L.award));
     f.labelOn2 = el('p', 'wl-o', ''); paper.appendChild(f.labelOn2); setOnView(f.labelOn2, s.id);
     var acts = el('p', 'wl-act'); f.wlLink = el('span', '', 'Copy link'); acts.appendChild(f.wlLink); paper.appendChild(acts);
-    f.wl.appendChild(paper); f.plane.appendChild(f.wl);
+    // The label hangs in its own wall-plane layer above every picture (round 10.1): if it shared its piece's face, a
+    // neighbouring picture drawn over that face could hide it and then uncover it at once mid-turn (a card "popping
+    // in"). Its layer has the same geometry and turn as the face, so it moves only with the camera.
+    f.wl.appendChild(paper);
+    f.wlFace = el('div', 'face face-wl'); f.wlPlane = el('div', 'plane wl-plane'); f.wlFace.setAttribute('aria-hidden', 'true');
+    f.wlPlane.appendChild(f.wl); f.wlFace.appendChild(f.wlPlane); ring.appendChild(f.wlFace);
     return f;
   });
   // Place the wall label in the plane, in the station picture's own coordinates (scene_r9.py: position, true scale and
@@ -4640,6 +4682,7 @@ html.walked-up .menu { z-index: 46; }
       placeLabel(f);
     });
     C.doors.forEach(layoutDoor);
+    layoutMarks();
   }
 
   // Readiness: everything goes through the asset store.
@@ -4745,9 +4788,11 @@ html.walked-up .menu { z-index: 46; }
   function legYaw(target, tm, fixedT) {
     if (C.yawSeg && Math.abs(C.yawSeg.p1 - target) < 1e-9) return;
     var st = C.yawSeg ? qeval(C.yawSeg, tm) : [C.yaw, 0, 0];
+    // A long doorway turn from rest cruises at the comfort speed instead of peaking far above it (round 10.1).
+    if (fixedT && !reduced && Math.abs(st[1]) < 1 && Math.abs(target - st[0]) > 55) { C.yawSeg = cruiseSeg(st[0], target, COMFORT_DEG_S, 1.0, tm); return; }
     var D = Math.abs(target - st[0]) / CAM.stepHint;
     var Tn = reduced ? 0.34 * Math.pow(Math.max(D, 0.25), 0.75) : fixedT || TIMING.turnPerStep * Math.pow(Math.max(D, 0.25), 0.75);
-    var factors = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.42, 1.15, 1.3, 1.5], chosen = null;
+    var factors = fixedT ? [1, 1.15, 1.3, 1.5, 1.8] : [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.42, 1.15, 1.3, 1.5], chosen = null;   // a timed turn is never sped up
     for (var k = 0; k < factors.length && !chosen; k++) {
       var cand = quintic(st[0], st[1], st[2], target, Tn * factors[k], tm);
       if (!overshoots(cand)) chosen = cand;
@@ -4772,9 +4817,7 @@ html.walked-up .menu { z-index: 46; }
       C.pending = null;
       var bad = urls.filter(isFailed);
       if (bad.length && token.what && token.what.kind === 'roomExit') { if (C.door) C.door.noLayers = true; }
-      else if (bad.length && token.what && token.what.kind === 'room' && C.door && C.door.layers && bad.every(function (u) { return u === C.door.layers.wall || u === C.door.layers.ext; })) {
-        C.door.noLayers = true;                                   // only the walk-through layers failed: walk in with a crossfade instead
-      }
+
       else if (bad.length) fail(token, bad);
       plan(now(), true); kick();
     });
@@ -4806,22 +4849,39 @@ html.walked-up .menu { z-index: 46; }
   // If either fails, this door crossfades instead of walking, rather than showing a flat photograph.
   function exitReady(tm) {
     var dr = C.door;
+    // Round 10.1: the gallery behind the doorway must be drawable before stepping out of a room (a room opened directly
+    // has not loaded the pieces around its doorway yet): the pieces on both sides of the doorway and the one it rests at.
+    if (dr && !C.dSeg && C.d >= 1 && ROOM[dr.room].door.yaw != null) {
+      var around = [nearestIdx(dr.yaw - CAM.stepHint / 2), nearestIdx(dr.yaw + CAM.stepHint / 2), dr.backIdx], urls = [];
+      around.forEach(function (i) { ensureStation(i); var u = stationSrc(ST[mod(i, ST.length)]); if (urls.indexOf(u) < 0 && !isFailed(u)) urls.push(u); });
+      if (urls.some(function (u) { return !isReady(u); })) { waitFor(urls, tm, { kind: 'roomExit', room: dr.room }); return false; }
+    }
     if (!dr || reduced || dr.noLayers || !dr.layers || !dr.ext0 || C.dSeg || C.d < 1) return true;
     var need = [dr.layers.wall, dr.layers.ext]; need.forEach(asset);
     if (need.some(isFailed)) { dr.noLayers = true; return true; }
     if (need.some(function (u) { return !isReady(u); })) { waitFor(need, tm, { kind: 'roomExit', room: dr.room }); return false; }
     return true;
   }
+  // The room's own picture is on screen and covers the gallery completely.
+  function roomOpaque(r) {
+    var sec = sections[r], bg = sec && sec.querySelector('.room-bg');
+    return !!(sec && bg && sec.classList.contains('on') && !sec.style.opacity && bg.classList.contains('ready'));
+  }
+  function galleryPainted(tm) { if (C.dSeg || C.d < 1 || reduced) return true; if (C.workOnAt == null || tm - C.workOnAt < 80) { kick(); return false; } return true; }
   // Given the camera and the latest intent, start the next leg. Called every frame when no leg runs.
   function plan(tm, retarget) {
     if (C.look) return;                                           // the walk-up owns the camera until it has stepped back
     if (C.pending || (C.drag && C.drag.active)) return;
     var want = C.intent.room;
     if (want === 'work') {
-      if (C.d > 0 || C.dSeg) { if (departureClear(tm) && exitReady(tm)) legDolly(0, tm); return; }
+      if (C.d > 0 || C.dSeg) { if (departureClear(tm) && exitReady(tm) && galleryPainted(tm)) legDolly(0, tm); return; }
       if (C.door) {
-        if (Math.abs(C.yaw - C.door.backYaw) > 1e-6) { legYaw(C.door.backYaw, tm, doorTurnT(C.door.backYaw)); return; }
-        retireDoor(C.door, tm); C.station = C.door.backIdx; C.door = null; announce(); return;
+        // Exit ruling (round 10.1): Back, Esc and browser Back return to the visit before the room (an explicit station:
+        // one comfortable turn straight to it); Menu > Gallery rests at the piece beside the doorway (shortest turn).
+        var tgtIdx = C.intent.station != null ? C.intent.station : C.door.backIdx, tgtYaw = tgtIdx === C.door.backIdx ? C.door.backYaw : yawFor(tgtIdx, C.yaw);
+        if (tgtIdx !== C.door.backIdx) { ensureStation(tgtIdx); if (!stationReady(tgtIdx)) { waitFor([stationSrc(ST[tgtIdx])], tm, { kind: 'station', index: tgtIdx }); return; } }
+        if (Math.abs(C.yaw - tgtYaw) > 1e-6) { legYaw(tgtYaw, tm, doorTurnT(tgtYaw)); return; }
+        retireDoor(C.door, tm); C.station = tgtIdx; C.intent.station = tgtIdx; C.intent.yaw = null; C.door = null; announce(); return;
       }
       if (C.intent.station != null && C.intent.station !== C.station && !C.failed) {
         ensureStation(C.intent.station);
@@ -4837,7 +4897,7 @@ html.walked-up .menu { z-index: 46; }
       if (C.d === 0 && !C.dSeg && Math.abs(C.yaw - C.door.yaw) > 1e-6) { if (departureClear(tm)) legYaw(C.door.yaw, tm, doorTurnT(C.door.yaw)); return; }
       if (C.yawSeg) return;
       if (C.d < 1) {
-        var ru = ensureRoom(want), du = doorSrc(ROOM[want]), lay = C.door.layers, need = [du, ru].concat(lay && !reduced && !C.door.noLayers ? [lay.wall, lay.ext] : []);
+        var ru = ensureRoom(want), du = doorSrc(ROOM[want]), lay = C.door.layers, need = [du, ru].concat(lay && !reduced ? [lay.wall, lay.ext] : []);
         need.forEach(asset);
         if (need.some(function (u) { return !isReady(u); })) { waitFor(need, tm, { kind: 'room', room: want }); return; }
         commitImage(C.door.f, du);
@@ -4871,16 +4931,14 @@ html.walked-up .menu { z-index: 46; }
     legYaw(yaw, tm, doorTurnT(yaw));
   }
   // A short turn to a neighbouring doorway keeps the door turn's time; a longer one is timed like turning past pieces.
-  // Round 10 timing ruling (REQUESTS 11): the turn toward a doorway is time-capped so a whole walk from the gallery into
-  // a room takes at most 3.2 s and from room to room at most 3.6 s; the doorway dolly keeps its own time (0.9 s). A far
-  // doorway therefore turns faster, still on a minimum-jerk curve (never a cut).
-  var WALK_BUDGET = { fromGallery: 3.2, fromRoom: 3.6 }, ARRIVE_SLACK = 0.25;
+  // Comfort cap (owner, round 10.1: the faster walks caused nausea). Every turn toward or back from a doorway peaks at
+  // no more than 45 degrees a second on its minimum-jerk curve (peak speed of a minimum-jerk move = 1.875 x distance /
+  // time), so a far doorway simply takes longer; it is never shortened to meet a total time, and never a cut.
+  var COMFORT_DEG_S = 45;
   function doorTurnT(target) {
-    var D = Math.abs(target - C.yaw) / CAM.stepHint;
+    var deg = Math.abs(target - C.yaw), D = deg / CAM.stepHint;
     var natural = D <= 0.75 ? TIMING.doorTurn : TIMING.turnPerStep * Math.pow(Math.max(D, 0.25), 0.75);
-    if (!C.walk || C.intent.room === 'work') return natural;
-    var left = C.walk.budget - (now() - C.walk.t0) / 1000 - TIMING.dolly - ARRIVE_SLACK;
-    return Math.max(0.35, Math.min(natural, left));
+    return Math.max(natural, 1.875 * deg / COMFORT_DEG_S);
   }
 
   // Named FSM state, for tests and for the focus rule.
@@ -4903,7 +4961,9 @@ html.walked-up .menu { z-index: 46; }
     if (C.view === 'walk' && C.intent.room === 'work' && !C.door && !faces[nearestIdx(C.yaw)].shown) return 'loading';
     return 'idle';
   }
+  var PRIME = null;                                               // the first frames of a link straight to a close-up
   function busy(tm) {
+    if (PRIME) return true;
     if (WH) return true;                                          // a trackpad swipe is in progress
     if (C.look && lookBusy()) return true;
     if (switching) return true;                                  // a photo set is loading
@@ -4979,7 +5039,6 @@ html.walked-up .menu { z-index: 46; }
             C.cover = null; C.coverDoor = null;
           }
           if (C.view === 'index') closeIndex(tm);
-          if (r.room !== 'work' && r.room !== C.intent.room) C.walk = { t0: tm, budget: C.door && C.d > 0 ? WALK_BUDGET.fromRoom : WALK_BUDGET.fromGallery };
           C.intent.room = r.room;
           if (r.look) {
             // Walk up to the piece: the camera first stands at it (a link or Forward), then steps toward it.
@@ -4993,7 +5052,7 @@ html.walked-up .menu { z-index: 46; }
             // From the index (or a deep link) the camera simply stands there; in the walk it turns there.
             if (tw(C.indexA, tm) > 0.001 || e.jump) jumpToStation(r.station);
             else { C.intent.station = r.station; C.intent.yaw = null; }
-          }
+          } else if (r.room === 'work' && r.implicit && C.door) { C.intent.station = null; C.intent.yaw = null; }   // Menu > Gallery from a room: the piece beside its doorway
           if (ROOM[r.room] && ROOM[r.room].gallery) buildGallery(r.room);
           if (r.room === 'contact') revealEmail();
           ensureRoom(r.room);
@@ -5187,7 +5246,7 @@ html.walked-up .menu { z-index: 46; }
     // overlays (art layer, label card), so the face is never re-rastered at 15 to 19 times its size, which could leave a
     // frame blank while the camera steps back out of the label.
     var wc = vis ? 'transform' : '';
-    if (vis !== f.vis) { f.el.style.visibility = vis ? 'inherit' : 'hidden'; f.vis = vis; }
+    if (vis !== f.vis) { f.el.style.visibility = vis ? 'inherit' : 'hidden'; if (f.wlFace) f.wlFace.style.visibility = vis ? 'inherit' : 'hidden'; f.vis = vis; }
     if (f._wc !== wc) { f.el.style.willChange = wc; f._wc = wc; }
 
     if (!vis) return;
@@ -5200,6 +5259,7 @@ html.walked-up .menu { z-index: 46; }
     f.el.style.zIndex = z;
     f.el.style.opacity = alpha < 1 ? alpha.toFixed(3) : '';
     f.el.style.transform = tf;
+    if (f.wlFace) { f.wlFace.style.zIndex = 25000; f.wlFace.style.opacity = f.el.style.opacity; f.wlFace.style.transform = tf; }
   }
   function render(tm) {
     var n = ST.length;
@@ -5219,13 +5279,16 @@ html.walked-up .menu { z-index: 46; }
     C.doors.slice().forEach(function (dr) {
       var ang = wrap180(dr.yaw - C.yaw), fixed = ROOM[dr.room].door.yaw != null;
       var a = fixed ? 1 : tw(dr.fade, tm) * mj(1 - Math.abs(ang) / Math.max(1, Math.abs(dr.yaw - dr.backYaw)));
-      if (dr.noLayers && (C.d > 0 || C.dSeg)) a = 0;    // no layers: the room fades straight into the gallery wall
+      if (dr.noLayers && !fixed && (C.d > 0 || C.dSeg)) a = 0;    // (older doorways only) no layers: the room fades into the wall
       placeFace(dr.f, ang, 0, a, false);
       if (dr.retired ? (fixed ? !dr.f.vis : a <= 0.001 && !twBusy(dr.fade, tm)) : (dr !== C.door && !dr.f.vis)) dropDoor(dr);
     });
+    placeMarks(tm);
     // Doorway: while turning, the door face shows the full doorway picture. Once straight ahead and moving through,
     // it shows the wall with the opening cut out, and the room is a separate, slower layer behind the opening.
-    var dr0 = C.door, flat = reduced || !!(dr0 && dr0.noLayers);
+    // Round 10.1 (Astra R10-02): without its depth layers a fixed doorway still walks, opaque: the doorway's own picture is
+    // carried by the dolly and the room is shown only on arrival (no translucent overlap). Only reduced motion crossfades.
+    var dr0 = C.door, opaqueFlat = !!(dr0 && dr0.noLayers && !reduced && ROOM[dr0.room].door.yaw != null), flat = reduced || !!(dr0 && dr0.noLayers);
     var layered = !!(dr0 && !flat && dr0.layers && dr0.ext0 && (C.d > 0 || C.dSeg) && !(C.d >= 1 && !C.dSeg));
     if (dr0) commitImage(dr0.f, layered && isReady(dr0.layers.wall) ? dr0.layers.wall : doorSrc(ROOM[dr0.room]));
     layered = layered && dr0.f.shown === dr0.layers.wall && isReady(dr0.layers.ext);
@@ -5243,7 +5306,8 @@ html.walked-up .menu { z-index: 46; }
       // Round 10: the doorway's opening grows faster on screen than the room behind it (the reveal is 0.5 m deep); the
       // room picture is never smaller than the visible opening, so no edge of it is ever seen through the doorway.
       var esz = ROOM[dr0.room].door.roomExtSize || [1536, 2303];
-      k = Math.max(k, (G.W - il - ir) / esz[0] * 1.002, (G.H - it - ib) / esz[1] * 1.002);
+      // The small safety margin fades to nothing on arrival, so the last frame of the walk equals the settled room (R10-03).
+      var cm = 1 + 0.002 * (1 - C.d); k = Math.max(k, (G.W - il - ir) / esz[0] * cm, (G.H - it - ib) / esz[1] * cm);
       var ex = ax - u0x * k, ey = ay - u0y * k, ew = esz[0] * k, eh = esz[1] * k;
       ex = Math.min(ex, il); if (ex + ew < G.W - ir) ex = G.W - ir - ew;
       ey = Math.min(ey, it); if (ey + eh < G.H - ib) ey = G.H - ib - eh;
@@ -5254,7 +5318,12 @@ html.walked-up .menu { z-index: 46; }
     } else if (roomLayer.style.visibility !== 'hidden') { roomLayer.style.visibility = 'hidden'; }
     // Dolly: walk straight to the doorway and through it. Leaving for the index the camera eases back slightly.
     var ia = tw(C.indexA, tm), sceneT = '';
-    if (C.door && C.d > 0 && !flat) {
+    // While a room is fully drawn over the gallery, the gallery stands at its own size behind it (round 10.1). A room
+    // opened directly otherwise gave the gallery's pictures their first layers at the doorway's full magnification
+    // (about 9 times), and stepping back out then needed more picture memory than a browser keeps: for one frame the
+    // pictures were not drawn. Standing at 1x behind the room, they are drawn once at their own size, as after walking in.
+    var behindRoom = !!(C.door && C.d >= 0.9999 && !C.dSeg && !C.look && roomOpaque(C.door.room));
+    if (C.door && C.d > 0 && (!flat || opaqueFlat) && !behindRoom) {
       var s = 1 + (C.door.sEnd - 1) * C.d;
       scene.style.transformOrigin = C.door.ox.toFixed(1) + 'px ' + C.door.oy.toFixed(1) + 'px';
       sceneT = 'translate(' + ((G.W / 2 - C.door.ox) * C.d).toFixed(2) + 'px,' + ((G.H / 2 - C.door.oy) * C.d).toFixed(2) + 'px) scale(' + s.toFixed(5) + ')';
@@ -5263,17 +5332,33 @@ html.walked-up .menu { z-index: 46; }
       sceneT = 'scale(' + (1 + 0.03 * ia).toFixed(4) + ')';
     }
     if (C.look) { var lt = lookFrame(tm); if (C.look) { sceneT = lt; scene.style.transformOrigin = '0 0'; } }
-    scene.style.transform = sceneT; scene.style.willChange = sceneT ? 'transform' : '';
+    // A link straight to a close-up (round 10.1): the gallery's pictures are first drawn at their own size, behind a
+    // black cover, for a few frames, and only then magnified. Drawn first at the close-up's magnification (up to about
+    // 27 times), stepping back out needed more picture memory than a browser keeps, and parts of the view were not drawn.
+    if (PRIME) {
+      if (PRIME.n++ < 3 && C.look) { sceneT = ''; kick(); }
+      else { PRIME.cover.remove(); PRIME = null; }
+    }
+    // The scene keeps one compositing layer for good (round 10.1): dropping it when a dolly or close-up ends re-rasters
+    // every picture at once, and for a frame some tiles could stay unpainted. At rest it holds an identity transform rather
+    // than none: going from a transform to none also dropped every picture for one frame as the walk out of a room ended.
+    scene.style.transform = sceneT || 'translate(0px, 0px) scale(1)'; if (scene.style.willChange !== 'transform') scene.style.willChange = 'transform';
     scene.style.visibility = ia >= 0.999 ? 'hidden' : '';
     // Rooms: visibility follows from the camera alone, so no room can be orphaned.
     var room = C.door ? C.door.room : null, arrived = room && C.d >= 0.9999 && !C.dSeg ? room : null;
     if (C.cover) { room = C.cover; arrived = C.cover; }
     ROOM_IDS.forEach(function (r) {
       var sec = sections[r];
-      if (r === 'work') { sec.classList.toggle('on', !arrived); return; }
+      if (r === 'work') {
+        // Leaving a room: the gallery is drawn (under the still opaque room) a few frames before the camera steps out, so
+        // its pictures are already painted when they come into view (round 10.1: no unpainted tiles on the way out).
+        var workOn = !arrived || C.intent.room !== arrived;
+        if (workOn && !sec.classList.contains('on')) C.workOnAt = tm;
+        sec.classList.toggle('on', workOn); return;
+      }
       if (r === room || r === C.intent.room) ensureRoom(r);          // commit the room picture as soon as it is decoded
       // Reduced motion crossfades; otherwise the room is shown only once arrived (the walk itself is drawn in layers).
-      var show = r === room && (flat ? C.d > 0 : (arrived === r || (!(dr0 && dr0.layers && dr0.ext0) && C.d > 0.74)));
+      var show = r === room && (opaqueFlat ? arrived === r : flat ? C.d > 0 : (arrived === r || (!(dr0 && dr0.layers && dr0.ext0) && C.d > 0.74)));
       sec.classList.toggle('on', show);
       var img = sec.querySelector('.room-bg');
       if (show && !arrived) {
@@ -5376,8 +5461,8 @@ html.walked-up .menu { z-index: 46; }
   $('nextBtn').addEventListener('click', function () { dispatch({ type: 'step', dir: 1 }); });
   var suppressClick = false;
   // The side zones turn, except over the artwork itself: a click on the work walks up to it (see the walk-up).
-  $('zonePrev').addEventListener('click', function (e) { if (!suppressClick && artAt(e.clientX, e.clientY) < 0 && labelAt(e.clientX, e.clientY) < 0) dispatch({ type: 'step', dir: -1 }); });
-  $('zoneNext').addEventListener('click', function (e) { if (!suppressClick && artAt(e.clientX, e.clientY) < 0 && labelAt(e.clientX, e.clientY) < 0) dispatch({ type: 'step', dir: 1 }); });
+  $('zonePrev').addEventListener('click', function (e) { if (!suppressClick && artAt(e.clientX, e.clientY) < 0 && labelAt(e.clientX, e.clientY) < 0 && !doorAt(e.clientX, e.clientY)) dispatch({ type: 'step', dir: -1 }); });
+  $('zoneNext').addEventListener('click', function (e) { if (!suppressClick && artAt(e.clientX, e.clientY) < 0 && labelAt(e.clientX, e.clientY) < 0 && !doorAt(e.clientX, e.clientY)) dispatch({ type: 'step', dir: 1 }); });
   function canDrag() { return ST.length > 1 && C.intent.room === 'work' && !C.door && C.d === 0 && C.view === 'walk' && !C.pending && !C.look; }
   // Two-finger horizontal trackpad swipe (addendum 3): the camera follows the fingers like a drag; when the gesture ends
   // (180 ms without wheel events, momentum included) it settles on at most one piece away, so momentum never skips two.
@@ -6197,7 +6282,7 @@ html.walked-up .menu { z-index: 46; }
   // The free area the close-up frames into: below the Back control, above the tools, between the arrows.
   function area() {
     var W = G.W, H = G.H;
-    return labelPhone() ? { x: 50, y: 104, w: W - 100, h: H - 104 - 112 } : { x: 84, y: 100, w: W - 168, h: H - 100 - 84 };   // clear of the arrows
+    return labelPhone() ? { x: 14, y: 104, w: W - 28, h: H - 104 - 112 } : { x: 84, y: 100, w: W - 168, h: H - 100 - 84 };   // phone: full width (the arrows step off the label)
   }
   function camFit(U, A) { var s = Math.min(A.w / U.w, A.h / U.h); return { s: s, tx: A.x + (A.w - U.w * s) / 2 - s * U.x, ty: A.y + (A.h - U.h * s) / 2 - s * U.y }; }
   // Keep the view inside the station's picture (the plate), so a close-up never shows past the photographed room.
@@ -6224,9 +6309,13 @@ html.walked-up .menu { z-index: 46; }
   // no forced minimum. Without headroom over the walk-up framing there is no closer level (click, wheel, pinch, button).
   function nativeScale(i) {
     var a = layerOf(i), r = layerRect(i); if (!a || !r) return 1;
-    var as = ASSETS[a.src], nw = as && as.state === 'ready' && as.img.naturalWidth ? as.img.naturalWidth : a.w;
+    // Owner exception (AI-enhanced zoom): with an Astra-approved enhanced layer the limit is its resolution instead.
+    var src = a.enh ? a.enh.src : a.src, as = ASSETS[src], nw = as && as.state === 'ready' && as.img.naturalWidth ? as.img.naturalWidth : (a.enh ? a.enh.w : a.w);
     return nw / (r.w * (window.devicePixelRatio || 1));
   }
+  // Source pixels of the original photograph per device pixel on screen now (above 1: past the original).
+  function pastNative(L) { var a = layerOf(L.st), r = layerRect(L.st); return a && r && L.cam ? (r.w * L.cam.s * (window.devicePixelRatio || 1)) / a.w : 0; }
+  var wuEnhNote = $('wuEnhNote');
   function detailScale(i) { return Math.max(nativeScale(i), lookCam(i).s); }
   function headroom(i) { return nativeScale(i) > lookCam(i).s * 1.05; }
   function detailCam(i, focus) {
@@ -6252,7 +6341,7 @@ html.walked-up .menu { z-index: 46; }
     var from = C.look ? C.look.cam || CAM0 : CAM0;
     C.look = { gen: gen, st: i, level: level, phase: opts.direct || reduced ? 'shown' : 'move', t0: tm, T: STEP, from: from, to: to, cam: opts.direct || reduced ? to : from,
       focus: null, alt: null, loupe: null, loupeOn: false, artA: { t0: tm, from: 0, to: 1 }, opener: opts.opener || document.activeElement, freeZoom: false };
-    var a = layerOf(i); if (a) { asset(a.src, 'high'); if (a.occ) asset(a.occ.src, 'high'); }
+    var a = layerOf(i); if (a) { asset(a.src, 'high'); if (a.occ) asset(a.occ.src, 'high'); if (a.enh) asset(a.enh.src, 'low'); }
     wuOpen(); showControls(false);
     if (C.look.phase === 'shown') arrive();
     kick();
@@ -6313,9 +6402,13 @@ html.walked-up .menu { z-index: 46; }
     var L = C.look, sl = L.phase === 'slide', st = sl && L.fadeSt != null ? L.fadeSt : L.st, a = layerOf(st), r = layerRect(st);
     if (sl && tm >= L.t0) a = null;                               // the slide itself runs without the overlay
     var occOk = !a || !a.occ || isReady(a.occ.src);                 // a foreground occluder (St. Lucia's riser) must be ready too
-    if (!a || !r || !isReady(a.src) || !occOk || sl && wuArtOpacity(tm) <= 0) { wuArt.hidden = true; wuOcc.hidden = true; if (a && !(isReady(a.src) && occOk) && L.artA.to === 1) L.artA.t0 = tm; return; }
+    if (!a || !r || !isReady(a.src) || !occOk || sl && wuArtOpacity(tm) <= 0) { wuArt.hidden = true; wuOcc.hidden = true; wuEnhNote.hidden = true; if (a && !(isReady(a.src) && occOk) && L.artA.to === 1) L.artA.t0 = tm; return; }
     var q = camApply(L.cam, r);
-    if (wuArt.getAttribute('src') !== a.src) wuArt.src = a.src;
+    var src = a.enh && isReady(a.enh.src) ? a.enh.src : a.src;      // the enhanced layer, once decoded, reduces to the same image at native
+    if (wuArt.getAttribute('src') !== src) wuArt.src = src;
+    // The note is shown only while an enhanced layer is actually drawn past the original's resolution (round 10.1: it
+    // showed past native with no enhanced layer installed, which said something untrue).
+    var past = !sl && src !== a.src && L.level !== 'label' && pastNative(L) > 1.01; if (wuEnhNote.hidden === past) wuEnhNote.hidden = !past;
     wuArt.hidden = false;
     wuArt.style.left = q.x.toFixed(2) + 'px'; wuArt.style.top = q.y.toFixed(2) + 'px'; wuArt.style.width = q.w.toFixed(2) + 'px'; wuArt.style.height = q.h.toFixed(2) + 'px';
     var o = wuArtOpacity(tm); wuArt.style.opacity = o >= 0.999 ? '' : o.toFixed(3);
@@ -6430,7 +6523,7 @@ html.walked-up .menu { z-index: 46; }
   }
   function closeLookNow() {
     var L = C.look; C.look = null;
-    WU.hidden = true; showControls(false); setLoupe(null); closeAlt(); wuArt.hidden = true; wuOcc.hidden = true; wuLink.hidden = true; wuCard.hidden = true; wuCard._st = -1; showWallCard();
+    WU.hidden = true; showControls(false); setLoupe(null); closeAlt(); wuArt.hidden = true; wuOcc.hidden = true; wuEnhNote.hidden = true; wuLink.hidden = true; wuCard.hidden = true; wuCard._st = -1; showWallCard();
     $('world').inert = false; document.documentElement.classList.remove('walked-up');
     updateNav();
     var back = L && L.opener && L.opener.isConnected && L.opener !== document.body ? L.opener : $('lookBtn');
@@ -6670,13 +6763,101 @@ html.walked-up .menu { z-index: 46; }
     if (L.alt != null) openAlt(L.alt);
   }
 
+  // =====================================================================================
+  // Round 10.1: every doorway can be walked through. Each fixed doorway carries, in its own wall plane (it turns, moves
+  // and is lit with the room, never fades), the room's name painted above the opening, and an invisible target over
+  // the opening: a clean click or tap walks into that room exactly like the Menu (a drag that starts there still turns
+  // the room). For the keyboard, a "Walk into <room>" button sits over each visible opening at rest.
+  // =====================================================================================
+  var MARKS = [];
+  (function buildMarks() {
+    var byYaw = {};
+    SCENE.rooms.forEach(function (r) {
+      var D = r.door; if (!D || D.yaw == null) return;
+      if (byYaw[D.yaw]) { byYaw[D.yaw].rooms.push(r.id); return; }
+      var face = el('div', 'face face-mark'), plane = el('div', 'plane mark-plane'), hit = el('div', 'door-hit'), sign = el('p', 'door-sign', r.title);
+      face.setAttribute('aria-hidden', 'true'); plane.appendChild(sign); plane.appendChild(hit); face.appendChild(plane); ring.appendChild(face);
+      var btn = el('button', 'art-target door-target', 'Walk into ' + r.title); btn.type = 'button'; btn.hidden = true; btn.setAttribute('data-door', r.id);
+      btn.addEventListener('click', function () { walkInto(m); });
+      workRoom.appendChild(btn);
+      var m = { yaw: D.yaw, rooms: [r.id], face: face, plane: plane, hit: hit, sign: sign, btn: btn, rect: D.rect, vis: false, key: '' };
+      byYaw[D.yaw] = m; MARKS.push(m);
+    });
+    layoutMarks();
+  })();
+  function walkInto(m) { dispatch({ type: 'go', hash: ROOM[m.rooms[0]].hash }); }
+  function layoutMarks() {
+    if (!MARKS || !MARKS.length || !G.mode) return;              // measure() runs once before the doorways are built
+    var c = camOf(G.mode), g = faceGeom(c.w, c.h, c.floorTarget, 0), q = G.q;
+    MARKS.forEach(function (m) {
+      var R = m.rect;
+      // The mark's plane covers only the doorway and its sign (three openings wide), not the whole frame, so that walking
+      // through the doorway never magnifies a frame-sized layer (which can starve the compositor). It turns about the
+      // same point as the frames: the screen centre.
+      var x0 = (R.x - R.w) * q, left = (G.W - g.wp) / 2 + x0, wd = 3 * R.w * q;
+      m.face.style.width = wd.toFixed(2) + 'px'; m.face.style.left = left.toFixed(2) + 'px';
+      m.face.style.transformOrigin = (G.W / 2 - left).toFixed(2) + 'px 50%';
+      m.plane.style.height = g.hp.toFixed(2) + 'px'; m.plane.style.marginTop = (-g.hp / 2).toFixed(2) + 'px'; m.plane.style.transform = 'translateY(' + g.ty.toFixed(2) + 'px)';
+      m.hit.style.left = (R.x * q - x0).toFixed(2) + 'px'; m.hit.style.top = (R.y * q).toFixed(2) + 'px'; m.hit.style.width = (R.w * q).toFixed(2) + 'px'; m.hit.style.height = (R.h * q).toFixed(2) + 'px';
+      // Museum signage: letters about 8 cm tall on the wall, centred over the opening, 15 cm above its head.
+      var fs = 26 * q; m.sign.style.fontSize = fs.toFixed(2) + 'px';
+      m.sign.style.left = '0px'; m.sign.style.width = wd.toFixed(2) + 'px';
+      m.sign.style.top = ((R.y - 0.075 * R.h) * q - fs * 1.15).toFixed(2) + 'px';
+      m.key = '';
+    });
+  }
+  function placeMarks(tm) {
+    if (!MARKS) return;
+    var rest = canDrag() && !C.look && !C.yawSeg && !WH && !C.door;
+    MARKS.forEach(function (m) {
+      // Drawn only while the opening itself (about 7 degrees either side) can be in view: a wall-plane element turned towards
+      // 90 degrees would project enormous and the compositor could leave it, and what lies near it, undrawn.
+      var ang = wrap180(m.yaw - C.yaw), vis = Math.abs(ang) < G.viewHalf + 9 && C.view === 'walk' && (!reduced || Math.abs(ang) < 1);
+      if (vis !== m.vis) { m.face.style.visibility = vis ? 'inherit' : 'hidden'; m.vis = vis; }
+      if (vis) {
+        m.face.style.zIndex = 31000;
+        m.face.style.transform = reduced ? 'none' : 'translateZ(' + G.F.toFixed(3) + 'px) rotateY(' + (-ang).toFixed(4) + 'deg) translateZ(' + (-G.F).toFixed(3) + 'px)';
+      }
+      // The keyboard's button follows the opening while the camera rests; it is not drawn (no pointer input).
+      var r = vis && rest ? m.hit.getBoundingClientRect() : null, on = !!(r && r.width > 4 && r.right > 0 && r.left < G.W);
+      var key = on ? [r.left, r.top, r.width, r.height].map(function (v) { return v.toFixed(0); }).join(',') : '';
+      if (key === m.key) return; m.key = key; m.btn.hidden = !on;
+      if (on) { m.btn.style.left = r.left.toFixed(1) + 'px'; m.btn.style.top = r.top.toFixed(1) + 'px'; m.btn.style.width = r.width.toFixed(1) + 'px'; m.btn.style.height = r.height.toFixed(1) + 'px'; }
+    });
+  }
+  // The doorway under a point: its projected opening, a few pixels larger. Only in the gallery, never walked up.
+  function doorAt(x, y) {
+    if (!MARKS) return null;
+    if (C.view !== 'walk' || C.intent.room !== 'work' || C.look || (C.drag && C.drag.active) || C.d > 0) return null;
+    for (var i = 0; i < MARKS.length; i++) {
+      var m = MARKS[i]; if (!m.vis) continue;
+      var r = m.hit.getBoundingClientRect(); if (!r.width) continue;
+      if (x >= r.left - 4 && x <= r.right + 4 && y >= r.top - 4 && y <= r.bottom + 4) return m;
+    }
+    return null;
+  }
+  workRoom.addEventListener('click', function (e) {
+    if (suppressClick || e.defaultPrevented || (e.target.closest && e.target.closest('button, a, .index, .plate'))) return;
+    var m = doorAt(e.clientX, e.clientY); if (m) { e.preventDefault(); walkInto(m); }
+  });
+  workRoom.addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse' || C.drag) return;
+    var on = !!doorAt(e.clientX, e.clientY); if (on !== workRoom._doorCur) { workRoom._doorCur = on; workRoom.classList.toggle('over-door', on); }
+  });
+
+
   (function start() {
     var r = parseRoute(curHash()), tm = now();
     var st0 = entryState(); cur = st0 ? st0.mi : 0;
     try { history.replaceState({ mi: cur, prev: st0 ? st0.prev : null }, '', '#' + r.hash); } catch (err) { /* sandboxed */ }
     if (r.room !== 'work') {
-      var byaw = ST[0].yawDeg, yaw = byaw + gapRight(0) / 2;
-      C.door = makeDoor(r.room, yaw, byaw, 0);
+      // A room opened directly stands in its own fixed doorway (round 10.1, Astra R10-01), with the piece beside it
+      // as the place it returns to, exactly as if it had walked in.
+      var Dy0 = ROOM[r.room].door.yaw, yaw, bidx, byaw;
+      if (Dy0 != null) { yaw = Dy0; bidx = nearestIdx(Dy0 - CAM.stepHint / 2); byaw = yawFor(bidx, yaw); }
+      else { byaw = ST[0].yawDeg; yaw = byaw + gapRight(0) / 2; bidx = 0; }
+      C.station = bidx; C.intent.station = bidx;
+      C.door = makeDoor(r.room, yaw, byaw, bidx);
       C.yaw = yaw; C.d = 1; C.intent.room = r.room;
       ensureRoom(r.room);
       if (ROOM[r.room].gallery) buildGallery(r.room);
@@ -6685,7 +6866,10 @@ html.walked-up .menu { z-index: 46; }
     }
     if (r.index) { setIndex(r.index, tm); C.indexA = Tween(1); if (r.index.level === 3) C.plateA = Tween(1); }
     if (r.station != null) jumpToStation(r.station);
-    if (r.look) enterLook(r.station, { direct: true, level: r.level });          // a link to a walked-up piece opens there, without the step
+    if (r.look) {
+      enterLook(r.station, { direct: true, level: r.level });          // a link to a walked-up piece opens there, without the step
+      var pc = el('div', 'prime-cover'); pc.setAttribute('aria-hidden', 'true'); document.body.appendChild(pc); PRIME = { n: 0, cover: pc };
+    }
     C.ui = Tween(r.room === 'work' && !r.index ? 1 : 0);
     updateNav(); announce();
     render(tm);
