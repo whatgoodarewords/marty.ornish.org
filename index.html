@@ -727,6 +727,15 @@ html.walked-up .menu { z-index: 46; }
 @keyframes wu-fade-in { from { opacity: 0; } to { opacity: 1; } }
 .wu-tools:not([hidden]), .wu-back:not([hidden]), .wu-nav:not([hidden]) { animation: wu-fade-in .25s ease both; }
 @media (prefers-reduced-motion: reduce) { .wu-tools:not([hidden]), .wu-back:not([hidden]), .wu-nav:not([hidden]) { animation: none; } }
+
+/* Round 10.7: on desktop the wall text is lettering on the wall, lit by the room; the dark pool behind it read as a
+   screen effect (and Safari drew it as a box). Phones keep the band, and so does Teaching, whose long text crosses the
+   table at every width. */
+@media (min-width: 761px) {
+  .room:not(.room-teaching) .label::before { display: none; }
+  .room:not(.room-teaching) .wall .label { color: #e9e2d6; text-shadow: 0 0 1px rgba(0,0,0,.35); mix-blend-mode: soft-light; }
+  .room:not(.room-teaching) .wall .ltitle, .room:not(.room-teaching) .wall .lbody, .room:not(.room-teaching) .wall .lbody.big { color: #ebe4d8; }
+}
 </style>
 
 <header class="top">
