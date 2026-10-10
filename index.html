@@ -722,6 +722,11 @@ html.walked-up .menu { z-index: 46; }
 .wu-enh[hidden] { display: none; }
 .face-wl { -webkit-mask-image: none; mask-image: none; pointer-events: none; }
 .wl-plane { -webkit-mask-image: none; mask-image: none; }
+/* Round 10.6: the close-up's controls fade in when they appear (they used to pop in); they still leave at once, when
+   the camera starts moving. Reduced motion keeps them instant. */
+@keyframes wu-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.wu-tools:not([hidden]), .wu-back:not([hidden]), .wu-nav:not([hidden]) { animation: wu-fade-in .25s ease both; }
+@media (prefers-reduced-motion: reduce) { .wu-tools:not([hidden]), .wu-back:not([hidden]), .wu-nav:not([hidden]) { animation: none; } }
 </style>
 
 <header class="top">
@@ -919,11 +924,11 @@ html.walked-up .menu { z-index: 46; }
       }
     },
     "timing": {
-      "turnPerStep": 0.85,
+      "turnPerStep": 1.0,
       "doorTurn": 0.6,
       "dolly": 0.9,
-      "roomText": 0.12,
-      "indexFade": 0.15
+      "roomText": 0.35,
+      "indexFade": 0.45
     },
     "routes": {
       "station": "station/{slug}",
@@ -4838,10 +4843,12 @@ html.walked-up .menu { z-index: 46; }
     else if (f.what && f.what.kind === 'room') dispatch({ type: 'go', hash: ROOM[f.what.room].hash });
     kick();
   });
-  // Captions and wall text leave before the camera moves.
+  // Captions and wall text leave before the camera moves. Round 10.6: they fade (they used to vanish in one frame). The
+  // gallery's chrome lets the camera start once it is two-thirds gone, so the last of its fade overlaps the first, slow
+  // frames of the move; wall text must be fully gone, because its room picture is hidden the moment the walk out starts.
   function departureClear(tm) {
     if (C.view !== 'walk') return false;
-    if (C.intent.room !== 'work' && tw(C.ui, tm) > 0.001) return false;
+    if (C.intent.room !== 'work' && tw(C.ui, tm) > 0.34) return false;
     for (var r in C.wall) if (r !== C.intent.room && tw(C.wall[r], tm) > 0.001) return false;
     return true;
   }
@@ -5203,12 +5210,13 @@ html.walked-up .menu { z-index: 46; }
     if (C.dSeg) { C.d = qeval(C.dSeg, tm)[0]; if (done(C.dSeg, tm)) { C.d = C.dSeg.p1; C.dSeg = null; } }
     if (C.idxT && tm - C.idxT.t0 >= C.idxT.T * 1000) finishIdxT();
     var atRestWalk = C.view === 'walk' && C.intent.room === 'work' && !C.door && C.d === 0 && !C.look;   // walked up: the gallery's chrome steps aside
-    // Spatial changes animate; chrome does not: captions, wall text, plate and viewer switch at once.
-    twTo(C.ui, atRestWalk ? 1 : 0, 0, tm);
+    // Spatial changes animate. Round 10.6: the gallery's chrome and the room's wall text fade (250 / 300 ms) instead of
+    // switching at once; plate and viewer still switch at once.
+    twTo(C.ui, atRestWalk ? 1 : 0, 250, tm);
     var arrived = C.door && C.door.room === C.intent.room && C.d === 1 && !C.dSeg ? C.door.room : null;
     twTo(C.indexA, C.view === 'index' ? 1 : 0, TIMING.indexFade * 1000, tm);
     if (C.cover && (C.view !== 'index' || tw(C.indexA, tm) >= 0.999)) { C.cover = null; C.coverDoor = null; }   // the index now hides it
-    ROOM_IDS.forEach(function (r) { twTo(C.wall[r], r === arrived || r === C.cover ? 1 : 0, r === arrived ? TIMING.roomText * 1000 : 0, tm); });
+    ROOM_IDS.forEach(function (r) { twTo(C.wall[r], r === arrived || r === C.cover ? 1 : 0, r === arrived ? TIMING.roomText * 1000 : r === C.cover ? 0 : 300, tm); });
     twTo(C.plateA, C.idx.level === 3 ? 1 : 0, 0, tm);
     // The outgoing index keeps its level and content until it has faded out; only then is it cleared.
     if (C.view === 'walk' && C.idx.level && tw(C.indexA, tm) <= 0.001) { C.idx.level = 0; $('idxCats').hidden = false; $('idxSeries').hidden = true; }
@@ -5317,7 +5325,9 @@ html.walked-up .menu { z-index: 46; }
       var ex0 = ROOM[dr0.room].door.exposure; roomLayerImg.style.filter = ex0 ? 'brightness(' + (ex0 + (1 - ex0) * mj(C.d)).toFixed(4) + ')' : '';   // the room beyond brightens as we walk in
     } else if (roomLayer.style.visibility !== 'hidden') { roomLayer.style.visibility = 'hidden'; }
     // Dolly: walk straight to the doorway and through it. Leaving for the index the camera eases back slightly.
-    var ia = tw(C.indexA, tm), sceneT = '';
+    // Round 10.6: the index fade is eased at both ends (a linear fade ended with a visible step as the last few percent of the
+    // gallery behind it vanished in one frame); thresholds still read the linear value.
+    var ia = tw(C.indexA, tm), iaE = smoothstep(0, 1, ia), sceneT = '';
     // While a room is fully drawn over the gallery, the gallery stands at its own size behind it (round 10.1). A room
     // opened directly otherwise gave the gallery's pictures their first layers at the doorway's full magnification
     // (about 9 times), and stepping back out then needed more picture memory than a browser keeps: for one frame the
@@ -5329,7 +5339,7 @@ html.walked-up .menu { z-index: 46; }
       sceneT = 'translate(' + ((G.W / 2 - C.door.ox) * C.d).toFixed(2) + 'px,' + ((G.H / 2 - C.door.oy) * C.d).toFixed(2) + 'px) scale(' + s.toFixed(5) + ')';
     } else if (!reduced && ia > 0.001 && ia < 0.999) {
       scene.style.transformOrigin = '50% 50%';
-      sceneT = 'scale(' + (1 + 0.03 * ia).toFixed(4) + ')';
+      sceneT = 'scale(' + (1 + 0.03 * iaE).toFixed(4) + ')';
     }
     if (C.look) { var lt = lookFrame(tm); if (C.look) { sceneT = lt; scene.style.transformOrigin = '0 0'; } }
     // A link straight to a close-up (round 10.1): the gallery's pictures are first drawn at their own size, behind a
@@ -5382,12 +5392,15 @@ html.walked-up .menu { z-index: 46; }
         setOnView(capOnView, ST[near].id);
         counter.innerHTML = '<b>' + pad(near + 1) + '</b> / ' + pad(n);
       }
-      // No fades: the phone plate and the counter swap at the turn midpoint and vanish when the walk is left.
-      var ui = tw(C.ui, tm) > 0.5 ? 'visible' : 'hidden';
-      caption.style.visibility = ui; counter.style.visibility = ui;
-      each('.room-work .arrow', function (x) { x.style.visibility = ui; });
-      var toolsOn = ui === 'visible' && dd < 0.3 && !C.pending;
-      $('workTools').style.visibility = toolsOn ? 'visible' : 'hidden';
+      // Round 10.6: the phone plate and the counter crossfade through the turn (out in the first half, in the second; their
+      // text still swaps at the midpoint, now unseen) and fade with the gallery's chrome; the arrows fade with it.
+      var uiA = tw(C.ui, tm), ui = uiA > 0.01 ? 'visible' : 'hidden', turnA = 1 - smoothstep(0.08, 0.4, dd);
+      var capA = uiA * turnA, capV = capA > 0.02 ? 'visible' : 'hidden';   // not clickable or focusable once faded
+      caption.style.visibility = capV; counter.style.visibility = capV;
+      caption.style.opacity = capA.toFixed(3); counter.style.opacity = capA.toFixed(3);
+      each('.room-work .arrow', function (x) { x.style.visibility = ui; x.style.opacity = uiA.toFixed(3); });
+      var toolsOn = uiA > 0.5 && dd < 0.3 && !C.pending, toolsA = C.pending ? 0 : uiA * (1 - smoothstep(0.1, 0.3, dd));
+      $('workTools').style.visibility = toolsA > 0.01 ? 'visible' : 'hidden'; $('workTools').style.opacity = toolsA.toFixed(3);
       placeTools(toolsOn, near, dd);
       placeArtTarget(toolsOn && dd < 0.02 && !C.look);
       document.querySelector('.modes').style.visibility = C.intent.room === 'work' && !C.menuOpen && !C.door ? 'visible' : 'hidden';
@@ -5402,13 +5415,14 @@ html.walked-up .menu { z-index: 46; }
     // Index, plate, viewer, menu
     if (C.idx.level !== 3 && PS.want) slotReset(PS);
     slotStatus(PS, tm); slotStatus(VS, tm);
-    indexEl.style.opacity = ia.toFixed(3);
+    indexEl.style.opacity = iaE.toFixed(3);
     indexEl.style.visibility = ia > 0.001 ? 'visible' : 'hidden';
-    indexEl.style.transform = reduced || ia >= 0.999 ? '' : 'scale(' + (1 + 0.015 * (1 - ia)).toFixed(4) + ')';
+    indexEl.style.pointerEvents = C.view === 'index' ? '' : 'none';  // a closing index no longer takes clicks
+    indexEl.style.transform = reduced || ia >= 0.999 ? '' : 'scale(' + (1 + 0.015 * (1 - iaE)).toFixed(4) + ')';
     workRoom.classList.toggle('indexing', ia > 0.001);
-    crumbs.style.opacity = ia.toFixed(3);
+    crumbs.style.opacity = iaE.toFixed(3);
     crumbs.hidden = !(ia > 0.001 && C.idx.level >= 2);
-    var pa = tw(C.plateA, tm) * ia;
+    var pa = tw(C.plateA, tm) * iaE;
     plateEl.hidden = pa <= 0.001;
     plateEl.style.opacity = pa.toFixed(3);
     plateEl.style.transform = reduced || pa >= 0.999 ? '' : 'scale(' + (0.985 + 0.015 * pa).toFixed(4) + ')';
@@ -6249,7 +6263,10 @@ html.walked-up .menu { z-index: 46; }
   // place, size, paper and light), so its text stays sharp at any distance. It appears at once (no fade) and follows
   // the camera; the card on the wall is beneath it, identical.
   var wuCard = el('div', 'wlabel wl-over'); wuCard.setAttribute('aria-hidden', 'true'); wuCard.hidden = true; wuStage.appendChild(wuCard);
-  var wuGen = 0, STEP = 0.55, FADE = 150;
+  var wuGen = 0, STEP = 0.8, FADE = 220;      // round 10.6: gentler close-up moves (0.55 s) and art-layer fades (150 ms)
+  // The slide turns the wall at once and the fixed overlay would drift off the turning picture: it leaves in 90 ms, while
+  // the turn has moved less than a tenth of a degree.
+  var SLIDE_FADE = 90;
   var LEVELS = ['look', 'detail', 'label'];
   C.look = null;   // { gen, st, level, phase: 'move' | 'slide' | 'out' | 'shown' | 'done', t0, T, from, to, cam, focus, alt, loupe, artA }
 
@@ -6294,6 +6311,17 @@ html.walked-up .menu { z-index: 46; }
     var lo2 = H - c.s * (R.y + R.h), hi2 = -c.s * R.y; c.ty = lo2 <= hi2 ? clamp(c.ty, lo2, hi2) : (lo2 + hi2) / 2;
     return c;
   }
+  // clampCam, with its limits widened to include the plain path P: continuous whether P is inside the plate or not.
+  function clampNear(c, i, P) {
+    var R = faceImgRect(i), W = G.W, H = G.H; if (!R) return c;
+    var need = Math.min(Math.max(W / R.w, H / R.h), P.s);
+    if (c.s < need) { var cx = (W / 2 - c.tx) / c.s, cy = (H / 2 - c.ty) / c.s; c = { s: need, tx: W / 2 - need * cx, ty: H / 2 - need * cy }; }
+    var lo = W - c.s * (R.x + R.w), hi = -c.s * R.x, lo2 = H - c.s * (R.y + R.h), hi2 = -c.s * R.y;
+    var pt = W / 2 - c.s * (W / 2 - P.tx) / P.s, pu = H / 2 - c.s * (H / 2 - P.ty) / P.s;   // P's view centre at this scale
+    function soft(x, lo_, hi_, p_) { if (lo_ > hi_) lo_ = hi_ = (lo_ + hi_) / 2; return clamp(x, Math.min(lo_, p_), Math.max(hi_, p_)); }
+    c.tx = soft(c.tx, lo, hi, pt); c.ty = soft(c.ty, lo2, hi2, pu);
+    return c;
+  }
   function lookCam(i) {
     var a = artRect(i), l = labelRect(i), U = union(a, l); if (!U) return CAM0;
     var pad = 0.04 * Math.max(U.w, U.h); U = { x: U.x - pad, y: U.y - pad, w: U.w + 2 * pad, h: U.h + 2 * pad };
@@ -6335,11 +6363,27 @@ html.walked-up .menu { z-index: 46; }
   function lookActive() { return !!C.look; }
   function stationView(i) { var v = ST[i].view; return v == null ? 0 : v; }
 
+  // Round 10.6: a close-up move that replaces one in progress keeps the camera's current velocity and eases it out,
+  // instead of starting from rest (a stop or an instant reversal read as a jump). Position at time t of a move:
+  // from + (to - from) * mj(u) + v0 * T * u (1 - u)^3, with u the move's progress; v0 per second for s, tx, ty and yaw.
+  function lookEval(L, t) {
+    var u = clamp((t - L.t0) / (L.T * 1000), 0, 1), e = mj(u), g = u * Math.pow(1 - u, 3) * L.T, v = L.v0;
+    var c = camLerp(L.from, L.to, e);
+    if (v) c = clampNear({ s: c.s + v.s * g, tx: c.tx + v.tx * g, ty: c.ty + v.ty * g }, L.st, c);   // never further past the plate than the plain path
+    var yaw = L.phase === 'slide' ? L.yaw0 + (L.yaw1 - L.yaw0) * e + (v ? v.yaw * g : 0) : null;
+    return { cam: c, yaw: yaw, u: u };
+  }
+  function lookVel(L, tm) {
+    if (!L || !(L.phase === 'move' || L.phase === 'out' || L.phase === 'slide') || tm < L.t0 || tm > L.t0 + L.T * 1000) return null;
+    var a = lookEval(L, tm - 8), b = lookEval(L, tm), k = 1000 / 8;
+    return { s: (b.cam.s - a.cam.s) * k, tx: (b.cam.tx - a.cam.tx) * k, ty: (b.cam.ty - a.cam.ty) * k, yaw: b.yaw != null && a.yaw != null ? (b.yaw - a.yaw) * k : 0 };
+  }
   function enterLook(i, opts) {
     opts = opts || {};
     var gen = ++wuGen, level = opts.level || 'look', tm = now(), to = camFor(i, level);
-    var from = C.look ? C.look.cam || CAM0 : CAM0;
-    C.look = { gen: gen, st: i, level: level, phase: opts.direct || reduced ? 'shown' : 'move', t0: tm, T: STEP, from: from, to: to, cam: opts.direct || reduced ? to : from,
+    if (C.look && C.look.ys) finishSlideTurn(C.look, Infinity);
+    var from = C.look ? C.look.cam || CAM0 : CAM0, v0 = lookVel(C.look, tm);
+    C.look = { gen: gen, st: i, level: level, v0: v0, phase: opts.direct || reduced ? 'shown' : 'move', t0: tm, T: STEP, from: from, to: to, cam: opts.direct || reduced ? to : from,
       focus: null, alt: null, loupe: null, loupeOn: false, artA: { t0: tm, from: 0, to: 1 }, opener: opts.opener || document.activeElement, freeZoom: false };
     var a = layerOf(i); if (a) { asset(a.src, 'high'); if (a.occ) asset(a.occ.src, 'high'); if (a.enh) asset(a.enh.src, 'low'); }
     wuOpen(); showControls(false);
@@ -6352,7 +6396,8 @@ html.walked-up .menu { z-index: 46; }
     var gen = ++wuGen; L.gen = gen; L.level = level; if (focus !== undefined) L.focus = focus;
     if (level !== 'detail') L.focus = null;
     setLoupe(null); closeAlt();
-    L.from = L.cam || CAM0; L.to = camFor(L.st, level, L.focus); L.t0 = now(); L.T = STEP; L.freeZoom = false;
+    var tm0 = now(); L.v0 = lookVel(L, tm0); if (L.v0) L.v0.yaw = 0;
+    L.from = L.cam || CAM0; L.to = camFor(L.st, level, L.focus); L.t0 = tm0; L.T = STEP; L.freeZoom = false;
     L.phase = reduced ? 'shown' : 'move'; if (reduced) { L.cam = L.to; arrive(); } else showControls(true, true);
     kick();
   }
@@ -6360,7 +6405,11 @@ html.walked-up .menu { z-index: 46; }
     var L = C.look; if (!L) return;
     opts = opts || {};
     var gen = ++wuGen;
-    L.gen = gen; L.phase = reduced || opts.cut ? 'done' : 'out'; L.t0 = now(); L.T = STEP; L.from = L.cam; L.to = CAM0;
+    var tm0 = now(), v0 = lookVel(L, tm0); if (v0) v0.yaw = 0;
+    // Stepping back during a slide finishes the turn as the camera withdraws (it used to stop between two pieces).
+    if (L.phase === 'slide') L.ys = { t0: L.t0, T: L.T, yaw0: L.yaw0, yaw1: L.yaw1, v: L.v0 ? L.v0.yaw : 0, st: L.st };
+    var T = L.ys ? Math.max(STEP, (L.ys.t0 + L.ys.T * 1000 - tm0) / 1000) : STEP;
+    L.gen = gen; L.phase = reduced || opts.cut ? 'done' : 'out'; L.v0 = v0; L.t0 = tm0; L.T = T; L.from = L.cam; L.to = CAM0;
     showControls(false); setLoupe(null); closeAlt();
     kick();
   }
@@ -6369,9 +6418,11 @@ html.walked-up .menu { z-index: 46; }
     var j = mod(L.st + dir, ST.length), gen = ++wuGen, tm = now();
     showControls(false); setLoupe(null); closeAlt();
     var cur = L.cam || CAM0, yaw1 = yawFor(j, C.yaw + (dir > 0 ? 1 : -1) * CAM.stepHint * 0.5);
-    // The art layer fades out over 150 ms with the camera still, then the camera slides (an overlay cannot turn with the wall).
-    C.look = { gen: gen, st: j, fadeSt: L.st, level: 'look', phase: reduced ? 'shown' : 'slide', t0: tm + (reduced ? 0 : FADE), T: TIMING.turnPerStep * 0.85, from: cur, to: lookCam(j), cam: reduced ? lookCam(j) : cur,
-      focus: null, alt: null, loupe: null, loupeOn: false, artA: { t0: tm, from: wuArtOpacity(tm), to: 0 }, opener: L.opener, yaw0: C.yaw, yaw1: yaw1, freeZoom: false };
+    // Round 10.6: the camera starts at once (it used to stand still for the 150 ms fade, a stop-start) and keeps the
+    // velocity of a slide already under way; the art layer fades out over the slide's slow first frames.
+    var v0 = lookVel(L, tm), fadeSt = L.phase === 'slide' ? L.fadeSt : L.st;
+    C.look = { gen: gen, st: j, fadeSt: fadeSt, level: 'look', phase: reduced ? 'shown' : 'slide', t0: tm, T: TIMING.turnPerStep * 1.0, v0: v0, from: cur, to: lookCam(j), cam: reduced ? lookCam(j) : cur,
+      focus: null, alt: null, loupe: null, loupeOn: false, artA: reduced ? { t0: tm, from: 1, to: 1 } : { t0: tm, from: wuArtOpacity(tm), to: 0, d: SLIDE_FADE }, opener: L.opener, yaw0: C.yaw, yaw1: yaw1, freeZoom: false };
     var a = layerOf(j); if (a) { asset(a.src, 'high'); if (a.occ) asset(a.occ.src, 'high'); }
     if (reduced) { C.yaw = yaw1; C.station = j; C.intent.station = j; arrive(); }
     pushHash(lookHash(j), true);
@@ -6382,25 +6433,31 @@ html.walked-up .menu { z-index: 46; }
   function lookFrame(tm) {
     var L = C.look; if (!L) return '';
     if (L.phase === 'move' || L.phase === 'out' || L.phase === 'slide') {
-      var p = clamp((tm - L.t0) / (L.T * 1000), 0, 1), e = mj(p);
+      var ev_ = lookEval(L, tm), p = ev_.u;
       if (tm < L.t0) kick();
-      L.cam = camLerp(L.from, L.to, e);
-      if (L.phase === 'slide') { C.yaw = L.yaw0 + (L.yaw1 - L.yaw0) * e; if (p >= 1) { C.station = L.st; C.intent.station = L.st; C.intent.yaw = null; } }
+      L.cam = ev_.cam;
+      if (L.phase === 'slide') { C.yaw = ev_.yaw; if (p >= 1) { C.station = L.st; C.intent.station = L.st; C.intent.yaw = null; } }
       if (L.phase === 'out' && p > 1 - FADE / (L.T * 1000) && L.artA.to !== 0) L.artA = { t0: tm, from: wuArtOpacity(tm), to: 0 };
       if (p >= 1) { if (L.phase === 'out') L.phase = 'done'; else { var wasSlide = L.phase === 'slide'; L.phase = 'shown'; if (wasSlide) L.artA = { t0: tm, from: 0, to: 1 }; arrive(); } }
     }
+    if (L.ys) { finishSlideTurn(L, L.phase === 'done' ? Infinity : tm); if (L.ys) kick(); }   // whatever the camera does meanwhile
     if (L.phase === 'done') { closeLookNow(); return ''; }
     drawArt(tm); drawCard();
     wuScrim.style.opacity = clamp((L.cam.s - 1) / 0.5, 0, 1).toFixed(3);       // the edges dim as the camera closes in
     var c = L.cam;
     return c.s === 1 && !c.tx && !c.ty ? '' : 'translate(' + c.tx.toFixed(2) + 'px,' + c.ty.toFixed(2) + 'px) scale(' + c.s.toFixed(5) + ')';
   }
+  function finishSlideTurn(L, tm) {
+    var Y = L.ys, u = clamp((tm - Y.t0) / (Y.T * 1000), 0, 1);
+    C.yaw = Y.yaw0 + (Y.yaw1 - Y.yaw0) * mj(u) + Y.v * u * Math.pow(1 - u, 3) * Y.T;
+    if (u >= 1) { C.yaw = Y.yaw1; C.station = Y.st; C.intent.station = Y.st; C.intent.yaw = null; L.ys = null; }
+  }
   // The art layer: drawn over the plate's art at the camera's own geometry. It fades in over 150 ms when the step
   // starts (or when it arrives later) and out over 150 ms before a slide or at the end of stepping back.
-  function wuArtOpacity(tm) { var L = C.look; if (!L) return 0; var A = L.artA, p = clamp((tm - A.t0) / FADE, 0, 1); return A.from + (A.to - A.from) * p; }
+  function wuArtOpacity(tm) { var L = C.look; if (!L) return 0; var A = L.artA, p = clamp((tm - A.t0) / (A.d || FADE), 0, 1); return A.from + (A.to - A.from) * p; }
   function drawArt(tm) {
     var L = C.look, sl = L.phase === 'slide', st = sl && L.fadeSt != null ? L.fadeSt : L.st, a = layerOf(st), r = layerRect(st);
-    if (sl && tm >= L.t0) a = null;                               // the slide itself runs without the overlay
+    if (sl && wuArtOpacity(tm) <= 0) a = null;                    // the slide runs without the overlay once it has faded
     var occOk = !a || !a.occ || isReady(a.occ.src);                 // a foreground occluder (St. Lucia's riser) must be ready too
     if (!a || !r || !isReady(a.src) || !occOk || sl && wuArtOpacity(tm) <= 0) { wuArt.hidden = true; wuOcc.hidden = true; wuEnhNote.hidden = true; if (a && !(isReady(a.src) && occOk) && L.artA.to === 1) L.artA.t0 = tm; return; }
     var q = camApply(L.cam, r);
@@ -6532,7 +6589,7 @@ html.walked-up .menu { z-index: 46; }
   }
   // Busy while the camera moves or the art layer is still fading (so the frame loop keeps drawing until it is done).
   function lookBusy() {
-    var L = C.look; if (!L) return false; if (L.phase !== 'shown') return true;
+    var L = C.look; if (!L) return false; if (L.phase !== 'shown' || L.ys) return true;
     var a = layerOf(L.st); if (!a || isFailed(a.src) || a.occ && isFailed(a.occ.src)) return false;   // a missing layer rests on the plate
     return !isReady(a.src) || !!a.occ && !isReady(a.occ.src) || now() - L.artA.t0 < FADE + 34;
   }
